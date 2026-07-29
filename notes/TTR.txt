@@ -1,0 +1,10 @@
+Things to remember:
+
+- Currently the google OAuth is set to testing
+    - You will need to publish the app (search how to do it)
+    - You will need to add the public url (link vercel men el a5er) to the list of urls
+
+
+features/login/utils/jwt.ts
+    line 21: return payload as unknown as GooglePayload;
+    Sha3boly el denia 5ales 34an ts ye5ras

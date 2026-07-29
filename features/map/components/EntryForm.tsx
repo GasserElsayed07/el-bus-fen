@@ -13,7 +13,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { kourneshStops } from "@/data/busStops";
+import { kourneshStops } from "@/shared/data/busStops";
 import { useMemo, useState } from "react";
 import { useUserStore } from "@/store/userStore";
 import { marker } from "../types";

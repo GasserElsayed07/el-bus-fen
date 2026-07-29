@@ -1,0 +1,8 @@
+The login with google should
+
+If the user is already in the db:
+    create a jwt token and save it in the browser
+else:
+    Create a user with his google info
+    create a jwt token and save it in the browser
+
