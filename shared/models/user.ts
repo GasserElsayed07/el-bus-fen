@@ -1,4 +1,5 @@
 import { InferSchemaType, Schema, model, models } from "mongoose";
+import { boolean } from "zod";
 
 const userSchema = new Schema(
   {
@@ -9,6 +10,7 @@ const userSchema = new Schema(
     long: { type: Number },
     busStop: { type: String },
     authType: { type: String },
+    onboarded: { type: boolean },
   },
   {
     strict: false,

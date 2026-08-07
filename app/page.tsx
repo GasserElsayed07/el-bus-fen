@@ -13,7 +13,7 @@ export default function Home() {
     async function manga() {
       console.log("I fired manga");
       const authCookie = await getAuthCookie();
-      console.log("authCookie", authCookie);
+      console.log("decoded authCookie", authCookie);
       const user = await getUserByFilter({ _id: authCookie?.userId });
       console.log("user", user, typeof user);
       setUser(user);

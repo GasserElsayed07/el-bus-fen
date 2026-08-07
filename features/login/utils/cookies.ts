@@ -4,7 +4,16 @@ import { createJWT, verifyJWT } from "./jwt";
 // import { UserDocument } from "@/shared/models/user";
 
 export async function saveAuthCookie(user: any) {
-  const token = await createJWT(user._id.toString());
+  const userId =
+    typeof user === "string" || typeof user === "number"
+      ? user.toString()
+      : (user?._id?.toString?.() ?? user?.id?.toString?.());
+
+  if (!userId) {
+    throw new Error("saveAuthCookie requires a user id or user object.");
+  }
+
+  const token = await createJWT(userId);
 
   const cookieStore = await cookies();
 

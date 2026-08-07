@@ -69,6 +69,7 @@ export default function EntryForm({ setMarkers }: { setMarkers: any }) {
       selectedMinute,
       selectedAmPm,
       selectedStop,
+      user,
     });
     const newMarker: marker = {
       hour: Number(selectedHour ?? 0),

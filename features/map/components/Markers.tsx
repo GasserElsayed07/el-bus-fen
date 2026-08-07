@@ -11,6 +11,14 @@ const busStopIcon = L.icon({
   iconAnchor: [16, 32],
 });
 
+const busIcon = L.icon({
+  iconUrl: "/icons/busIcon.png",
+  iconSize: [32, 32],
+  iconAnchor: [16, 16],
+});
+
+const icon = busStopIcon;
+
 export default function Markers({
   markers,
   setSelectedMarker,
@@ -26,7 +34,7 @@ export default function Markers({
         <Marker
           key={i + marker.lat}
           position={[marker.lat, marker.long]}
-          icon={busStopIcon}
+          icon={icon}
           eventHandlers={{
             click: () => {
               setSelectedMarker(marker);

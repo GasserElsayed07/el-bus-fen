@@ -1,4 +1,4 @@
-type stop = {
+export type stop = {
   order: number;
   name_ar: string;
   name_en: string;
