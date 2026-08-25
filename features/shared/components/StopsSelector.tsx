@@ -8,7 +8,7 @@ import {
   SelectValue,
   SelectItem,
 } from "@/components/ui/select";
-import { type stop } from "@/shared/data/busStops";
+import { type stop } from "@/features/shared/data/busStops";
 
 export interface StopOption {
   label: string;
@@ -21,11 +21,12 @@ interface StopsSelectorProps {
   options: any[];
   className?: string;
   text?: string;
+  route: boolean;
 }
 
-const createStopOptions = (stops: stop[]) =>
+const createStopOptions = (stops: stop[], route: boolean) =>
   stops.map((stop) => ({
-    label: `${stop.order}. ${stop.name_en}`,
+    label: `${route ? "" : stop.order + ". "} ${stop.name_en}`,
     value: stop.name_en.toString(),
   }));
 
@@ -35,6 +36,7 @@ export default function StopsSelector({
   options,
   className,
   text,
+  route,
 }: StopsSelectorProps) {
   return (
     <Select value={selected} onValueChange={(value) => setSelected(value)}>
@@ -42,7 +44,7 @@ export default function StopsSelector({
         <SelectValue placeholder={text || "Select an option "} />
       </SelectTrigger>
       <SelectContent>
-        {createStopOptions(options).map((option) => (
+        {createStopOptions(options, route).map((option) => (
           <SelectItem key={option.value} value={option.value}>
             {option.label}
           </SelectItem>

@@ -27,8 +27,19 @@ export async function saveAuthCookie(user: any) {
 }
 
 export async function getAuthCookie() {
+  console.time("cookies");
+
   const cookieStore = await cookies();
-  const authCookie = await cookieStore.get("auth-token");
+
+  console.timeEnd("cookies");
+
+  console.time("get cookie");
+
+  const authCookie = cookieStore.get("auth-token");
+
+  console.timeEnd("get cookie");
+
   if (!authCookie) return null;
+
   return verifyJWT(authCookie.value);
 }

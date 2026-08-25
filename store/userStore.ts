@@ -1,23 +1,18 @@
 import { create } from "zustand";
-
-type User = {
-  name: string;
-  lat: number;
-  long: number;
-  route?: string;
-  busStop?: string;
-};
+import { type UserType } from "@/features/shared/models/user";
 
 type UserStore = {
-  user: User | null;
-  useUser: (user: User | null) => void;
+  user: UserType | null;
+  useUser: (user: UserType | null) => void;
 };
 
 const dummyUser = {
   name: "mangawy",
   lat: 31.250545425899407,
   long: 29.970028787218897,
-};
+  email: "",
+  _id: null,
+} as unknown as UserType;
 
 export const useUserStore = create<UserStore>((set) => ({
   user: dummyUser,

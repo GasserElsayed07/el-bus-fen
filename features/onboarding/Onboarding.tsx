@@ -1,32 +1,31 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ChevronLeft } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import FirstPage from "./components/FirstPage";
 import SecondPage from "./components/SecondPage";
 import { MoveRight } from "lucide-react";
+import { useOnboarding } from "./hooks/useOnboardingHook";
 
 export default function Onboarding() {
-  const [currentStep, setCurrentStep] = useState(1);
-  const [selectedStop, setSelectedStop] = useState<string | null>(null);
+  const {
+    selectedRoute,
+    setSelectedRoute,
+    selectedStop,
+    setSelectedStop,
+    name,
+    setName,
+    currentStep,
+    handleNextStep,
+    handleBackStep,
+  } = useOnboarding();
 
-  function handleNextStep() {
-    if (currentStep === 1) {
-      setCurrentStep(2);
-    }
-    if (currentStep === 2) {
-      // go to the map page
-    }
-  }
-
-  function handleBackStep() {
-    if (currentStep > 1) {
-      setCurrentStep(currentStep - 1);
-    }
-  }
-
+  // useEffect(() => {
+  //   console.log("Detected selectedRoute change:", selectedRoute);
+  //   console.log("Detected selectedStop change:", selectedStop);
+  // }, [selectedRoute, selectedStop]);
   return (
     <div className="flex flex-col items-center justify-between pt-14 min-h-screen">
       <div className="flex w-full items-center relative px-8 gap-2">
@@ -47,9 +46,11 @@ export default function Onboarding() {
         <FirstPage
           selectedStop={selectedStop}
           setSelectedStop={setSelectedStop}
+          selectedRoute={selectedRoute}
+          setSelectedRoute={setSelectedRoute}
         />
       )}
-      {currentStep === 2 && <SecondPage />}
+      {currentStep === 2 && <SecondPage name={name} setName={setName} />}
       <div
         className={`flex w-full h-full gap-0 ${currentStep == 2 && "gap-2"} flex-col items-center mb-5`}
       >

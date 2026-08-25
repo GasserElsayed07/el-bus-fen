@@ -1,7 +1,8 @@
 "use server";
 
-import { User, UserDocument } from "@/shared/models/user";
-import { dbConnect } from "@/shared/dbConnect";
+import { User } from "@/features/shared/models/user";
+import { type UserType } from "@/features/shared/models/user";
+import { dbConnect } from "@/features/shared/dbConnect";
 
 export async function getAllUsers() {
   try {
@@ -28,12 +29,38 @@ export async function getUserByFilter(filter: object) {
   }
 }
 
-export async function addUser(userToBeAdded: UserDocument) {
+export async function addUser(userToBeAdded: UserType) {
   try {
     await dbConnect();
     const user = await User.insertOne(userToBeAdded);
     return JSON.parse(JSON.stringify(user));
   } catch (error) {
     console.error("Failed to add user.", error);
+  }
+}
+
+export async function updateUserWithCustomFields(
+  toBeUpdatedFields: object,
+  userId,
+) {
+  try {
+    await dbConnect();
+    console.log(
+      "type of userId is: " + typeof userId,
+      "and has value of: ",
+      userId,
+    );
+    const user = await User.updateOne(
+      { _id: userId },
+      { $set: toBeUpdatedFields },
+    );
+    return JSON.parse(JSON.stringify(user));
+  } catch (error) {
+    console.error(
+      "Failed to update user with custom fields: ",
+      toBeUpdatedFields,
+      "error: ",
+      error,
+    );
   }
 }

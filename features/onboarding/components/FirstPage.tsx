@@ -2,16 +2,21 @@
 
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
-import { kourneshStops } from "@/shared/data/busStops";
+import { kourneshStops } from "@/features/shared/data/busStops";
 import { useMemo, useState } from "react";
-import StopsSelector from "@/shared/components/StopsSelector";
+import StopsSelector from "@/features/shared/components/StopsSelector";
+import { busRoutes } from "@/features/shared/data/routes";
 
 export default function FirstPage({
   selectedStop,
   setSelectedStop,
+  selectedRoute,
+  setSelectedRoute,
 }: {
   selectedStop: string | null;
   setSelectedStop: any;
+  selectedRoute: string | null;
+  setSelectedRoute: any;
 }) {
   return (
     <div className="flex flex-col justify-between items-center relative h-full w-full">
@@ -22,9 +27,10 @@ export default function FirstPage({
         <StopsSelector
           className="w-49"
           text="Select a route"
-          selected={selectedStop}
-          setSelected={setSelectedStop}
-          options={kourneshStops}
+          selected={selectedRoute}
+          setSelected={setSelectedRoute}
+          options={busRoutes}
+          route={true}
         />
         <StopsSelector
           className="w-49"
@@ -32,6 +38,7 @@ export default function FirstPage({
           selected={selectedStop}
           setSelected={setSelectedStop}
           options={kourneshStops}
+          route={false}
         />
       </div>
     </div>

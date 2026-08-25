@@ -36,7 +36,11 @@ interface AuthPayload {
 }
 
 export async function verifyJWT(token: string): Promise<AuthPayload> {
+  console.time("jwtVerify");
+
   const { payload } = await jwtVerify(token, secret);
+
+  console.timeEnd("jwtVerify");
 
   if (typeof payload.userId !== "string") {
     throw new Error("Invalid auth token.");
