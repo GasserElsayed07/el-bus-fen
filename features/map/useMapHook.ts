@@ -27,17 +27,21 @@ export function createMarkers(
 }
 
 export function useMap() {
-  const busStopsMarkers = createMarkers(kourneshStops);
-  const [markers, setMarkers] = useState<marker[]>(busStopsMarkers);
+  const [entries, setEntries] = useState<marker[]>([dummyMarker]);
+  const [busStopMarkers, setBusStopMarkers] = useState<marker[]>(
+    createMarkers(kourneshStops),
+  );
 
   const [selectedMarker, setSelectedMarker] = useState<marker | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
 
   return {
-    markers,
-    setMarkers,
+    busStopMarkers,
+    setBusStopMarkers,
     selectedMarker,
     setSelectedMarker,
+    entries,
+    setEntries,
     dialogOpen,
     setDialogOpen,
   };

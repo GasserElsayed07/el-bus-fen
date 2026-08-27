@@ -15,10 +15,12 @@ import Markers from "./components/Markers";
 
 export default function Map() {
   const {
-    markers,
-    setMarkers,
+    busStopMarkers,
+    setBusStopMarkers,
     selectedMarker,
     setSelectedMarker,
+    entries,
+    setEntries,
     dialogOpen,
     setDialogOpen,
   } = useMap();
@@ -33,7 +35,8 @@ export default function Map() {
         <TileLayer url="https://tile.openstreetmap.org/{z}/{x}/{y}.png" />
 
         <Markers
-          markers={markers}
+          markers={busStopMarkers}
+          entries={entries}
           setSelectedMarker={setSelectedMarker}
           setDialogOpen={setDialogOpen}
         />
@@ -67,7 +70,7 @@ export default function Map() {
         </DialogContent>
       </Dialog>
 
-      <EntryForm setMarkers={setMarkers} />
+      <EntryForm setMarkers={setEntries} />
     </div>
   );
 }

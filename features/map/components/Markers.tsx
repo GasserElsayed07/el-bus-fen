@@ -5,10 +5,16 @@ import { Marker, Tooltip } from "react-leaflet";
 import L from "leaflet";
 import { getMinutesAgo } from "../utils";
 
-const busStopIcon = L.icon({
+const busEntryIcon = L.icon({
   iconUrl: "/icons/mapMarker.png",
   iconSize: [21, 32],
   iconAnchor: [16, 32],
+});
+
+const busStopIcon = L.icon({
+  iconUrl: "/icons/busStopIcon.png",
+  iconSize: [32, 32],
+  iconAnchor: [20, 32],
 });
 
 const busIcon = L.icon({
@@ -17,24 +23,27 @@ const busIcon = L.icon({
   iconAnchor: [16, 16],
 });
 
-const icon = busStopIcon;
+const icon = busEntryIcon;
 
 export default function Markers({
   markers,
+  entries,
   setSelectedMarker,
   setDialogOpen,
 }: {
   markers: marker[];
+  entries: marker[]; // Replace 'any' with the actual type for entries
   setSelectedMarker: (marker: marker | null) => void;
   setDialogOpen: (open: boolean) => void;
 }) {
   return (
     <div>
-      {markers.map((marker, i) => (
+      {entries.map((marker, i) => (
         <Marker
           key={i + marker.lat}
           position={[marker.lat, marker.long]}
           icon={icon}
+          opacity={0}
           eventHandlers={{
             click: () => {
               setSelectedMarker(marker);
@@ -60,6 +69,13 @@ export default function Markers({
                             .padStart(2, "0")} AM`}</div> */}
           </Tooltip>
         </Marker>
+      ))}
+      {markers.map((entry, i) => (
+        <Marker
+          key={i + entry.lat}
+          position={[entry.lat, entry.long]}
+          icon={busStopIcon}
+        ></Marker>
       ))}
     </div>
   );
