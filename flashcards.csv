@@ -1,3 +1,6 @@
 "Why does a fixed footer need bottom space reserved in the page shell?","Fixed-position elements are removed from normal document flow, so the page needs matching bottom padding to prevent its last content from being hidden underneath the footer.","layout,navbar"
 "How are full-viewport authenticated pages sized with the fixed navbar?","Their viewport height uses `100dvh - 2.5rem`, matching the footer's `h-10` height, so the screen content ends above the navbar.","layout,navbar"
 "Where is the authenticated fixed navbar shell implemented?","In `store/UserStoreProvider.tsx`, which wraps authenticated children with a reserved main region and fixed footer navigation.","layout,navbar,auth"
+"Where does onboarding refresh the in-memory user after saving?","In `features/onboarding/hooks/useOnboardingHook.ts`, through `refetchUserAndSaveToUserStore`.","onboarding,user-store"
+"Why must onboarding await the database update before refetching the user?","The refetch must happen after persistence completes; otherwise it can read and store the pre-update user record.","onboarding,user-store"
+"How is the refetched onboarding user synchronized with Zustand?","The hook calls `getCurrentUser` and passes the result, or `null` when absent, to the store's `useUser` setter.","onboarding,user-store,zustand"

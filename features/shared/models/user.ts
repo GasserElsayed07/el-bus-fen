@@ -7,7 +7,7 @@ const userSchema = new Schema({
   lat: { type: Number },
   long: { type: Number },
   busRoute: { type: String },
-  busStop: { type: String },
+  busStopId: { type: String },
   authType: { type: String },
   onboarded: { type: Boolean },
 });
@@ -19,7 +19,7 @@ export type UserType = {
   lat?: number;
   long?: number;
   busRoute?: string;
-  busStop?: string;
+  busStopId?: string;
   authType?: string;
   onboarded?: boolean;
   _id?: string; // just to silent typeScript

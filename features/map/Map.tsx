@@ -24,6 +24,8 @@ export default function Map() {
     setEntries,
     dialogOpen,
     setDialogOpen,
+    selectedBusStop,
+    setSelectedBusStop,
   } = useMap();
 
   return (
@@ -72,7 +74,11 @@ export default function Map() {
           </DialogContent>
         </Dialog>
 
-        <EntryForm setMarkers={setEntries} />
+        <EntryForm
+          setMarkers={setEntries}
+          selectedStop={selectedBusStop}
+          setSelectedStop={setSelectedBusStop}
+        />
       </div>
       <BottomNavbar />
     </>

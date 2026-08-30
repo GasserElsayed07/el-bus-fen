@@ -27,7 +27,7 @@ interface StopsSelectorProps {
 const createStopOptions = (stops: stop[], route: boolean) =>
   stops.map((stop) => ({
     label: `${route ? "" : stop.order + ". "} ${stop.name_en}`,
-    value: stop.name_en.toString(),
+    value: stop.id,
   }));
 
 export default function StopsSelector({
@@ -40,7 +40,13 @@ export default function StopsSelector({
 }: StopsSelectorProps) {
   return (
     <Select value={selected} onValueChange={(value) => setSelected(value)}>
-      <SelectTrigger className={`w-full max-w-xs ${className ?? ""}`}>
+      <SelectTrigger
+        className={`w-full max-w-xs ${className ?? ""}`}
+        onClick={(e) => {
+          e.stopPropagation();
+          console.log("SelectTrigger clicked" + e.target);
+        }}
+      >
         <SelectValue placeholder={text || "Select an option "} />
       </SelectTrigger>
       <SelectContent>

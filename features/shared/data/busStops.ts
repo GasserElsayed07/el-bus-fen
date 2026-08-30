@@ -1,4 +1,5 @@
 export type stop = {
+  id: string;
   order: number;
   name_ar: string;
   name_en: string;
@@ -10,6 +11,7 @@ type lineStops = stop[];
 
 export const kourneshStops: lineStops = [
   {
+    id: "k1",
     order: 1,
     name_ar: "فندق سيسل",
     name_en: "Cecil Hotel",
@@ -17,6 +19,7 @@ export const kourneshStops: lineStops = [
     long: 29.898372,
   },
   {
+    id: "k2",
     order: 2,
     name_ar: "الأزاريطة (بنك مصر)",
     name_en: "Azarita (Banque Misr)",
@@ -24,6 +27,7 @@ export const kourneshStops: lineStops = [
     long: 29.905134,
   },
   {
+    id: "k3",
     order: 3,
     name_ar: "خلف مكتبة الإسكندرية على البحر",
     name_en: "Behind Bibliotheca Alexandrina (Corniche)",
@@ -31,6 +35,7 @@ export const kourneshStops: lineStops = [
     long: 29.909125,
   },
   {
+    id: "k4",
     order: 4,
     name_ar: "إشارة سان مارك - ش بورسعيد",
     name_en: "San Mark Signal - Port Said St.",
@@ -38,6 +43,7 @@ export const kourneshStops: lineStops = [
     long: 29.917171,
   },
   {
+    id: "k5",
     order: 5,
     name_ar: "كوبرى الجامعة (بمبة) - ش بورسعيد",
     name_en: "University Bridge (Bomba) - Port Said St.",
@@ -45,6 +51,7 @@ export const kourneshStops: lineStops = [
     long: 29.920354,
   },
   {
+    id: "k6",
     order: 6,
     name_ar: "دوران كامب شيزار - ش بورسعيد",
     name_en: "Camp Shizar Roundabout - Port Said St.",
@@ -52,6 +59,7 @@ export const kourneshStops: lineStops = [
     long: 29.922454,
   },
   {
+    id: "k7",
     order: 7,
     name_ar: "دوران الإبراهيمية - ش بورسعيد",
     name_en: "Ibrahimia Roundabout - Port Said St.",
@@ -59,6 +67,7 @@ export const kourneshStops: lineStops = [
     long: 29.926679,
   },
   {
+    id: "k8",
     order: 8,
     name_ar: "دوران سبورتنج - ش بورسعيد",
     name_en: "Sporting Roundabout - Port Said St.",
@@ -66,6 +75,7 @@ export const kourneshStops: lineStops = [
     long: 29.9325,
   },
   {
+    id: "k9",
     order: 9,
     name_ar: "دوران كليوباترا - ش بورسعيد",
     name_en: "Cleopatra Roundabout - Port Said St.",
@@ -73,6 +83,7 @@ export const kourneshStops: lineStops = [
     long: 29.936964,
   },
   {
+    id: "k10",
     order: 10,
     name_ar: "بيع المصنوعات (سيدي جابر) - ش بورسعيد",
     name_en: "Bay' El-Masnouat (Sidi Gaber) - Port Said St.",
@@ -80,6 +91,7 @@ export const kourneshStops: lineStops = [
     long: 29.931979,
   },
   {
+    id: "k11",
     order: 11,
     name_ar: "محطة محمد محفوظ (الترام)",
     name_en: "Mohamed Mahfouz Tram Station",
@@ -87,6 +99,7 @@ export const kourneshStops: lineStops = [
     long: 29.948293,
   },
   {
+    id: "k12",
     order: 12,
     name_ar: "ش سوريا (بنك مصر)",
     name_en: "Syria St. (Banque Misr)",
@@ -94,6 +107,7 @@ export const kourneshStops: lineStops = [
     long: 29.951055,
   },
   {
+    id: "k13",
     order: 13,
     name_ar: "ش سوريا (بنك CIB)",
     name_en: "Syria St. (CIB Bank)",
@@ -101,6 +115,7 @@ export const kourneshStops: lineStops = [
     long: 29.949945,
   },
   {
+    id: "k14",
     order: 14,
     name_ar: "سلطانة ستانلي",
     name_en: "Stanley Sultana",
@@ -108,6 +123,7 @@ export const kourneshStops: lineStops = [
     long: 29.949053,
   },
   {
+    id: "k15",
     order: 15,
     name_ar: "نفق ستانلي",
     name_en: "Stanley Tunnel",
@@ -115,6 +131,7 @@ export const kourneshStops: lineStops = [
     long: 29.950654,
   },
   {
+    id: "k16",
     order: 16,
     name_ar: "سابا باشا (بافلة)",
     name_en: "Saba Pasha (Bafla)",
@@ -122,6 +139,7 @@ export const kourneshStops: lineStops = [
     long: 29.955094,
   },
   {
+    id: "k17",
     order: 17,
     name_ar: "إيفون جليم",
     name_en: "Yvonne Gleem",
@@ -129,6 +147,7 @@ export const kourneshStops: lineStops = [
     long: 29.958559,
   },
   {
+    id: "k18",
     order: 18,
     name_ar: "فندق بلازا",
     name_en: "Plaza Hotel",
@@ -136,6 +155,7 @@ export const kourneshStops: lineStops = [
     long: 29.964763,
   },
   {
+    id: "k19",
     order: 19,
     name_ar: "فندق 26 يوليو (بعد الإشارة)",
     name_en: "26th of July Hotel (After the Traffic Light)",
@@ -143,6 +163,7 @@ export const kourneshStops: lineStops = [
     long: 29.9681,
   },
   {
+    id: "k20",
     order: 20,
     name_ar: "كوكي مان",
     name_en: "Cookie Man",
@@ -150,6 +171,7 @@ export const kourneshStops: lineStops = [
     long: 29.970069,
   },
   {
+    id: "k21",
     order: 21,
     name_ar: "بعد إشارة 4×4 قبل الإقبال",
     name_en: "After 4×4 Traffic Light, Before El-Ekbal",
@@ -157,6 +179,7 @@ export const kourneshStops: lineStops = [
     long: 29.972754,
   },
   {
+    id: "k22",
     order: 22,
     name_ar: "نفق المحروسة",
     name_en: "El Mahrousa Tunnel",
@@ -164,6 +187,7 @@ export const kourneshStops: lineStops = [
     long: 29.975758,
   },
   {
+    id: "k23",
     order: 23,
     name_ar: "بنك HSBC",
     name_en: "HSBC Bank",
@@ -171,6 +195,7 @@ export const kourneshStops: lineStops = [
     long: 29.9773,
   },
   {
+    id: "k24",
     order: 24,
     name_ar: "النساجون الشرقيون",
     name_en: "Oriental Weavers",
@@ -178,6 +203,7 @@ export const kourneshStops: lineStops = [
     long: 29.984099,
   },
   {
+    id: "k25",
     order: 25,
     name_ar: "جيلياتي لبنان (البنك الأهلي)",
     name_en: "Gelati Lebanon (National Bank of Egypt)",
@@ -185,6 +211,7 @@ export const kourneshStops: lineStops = [
     long: 29.987487,
   },
   {
+    id: "k26",
     order: 26,
     name_ar: "نفق اسكندر إبراهيم على البحر",
     name_en: "Eskandar Ibrahim Tunnel (Corniche)",
@@ -192,6 +219,7 @@ export const kourneshStops: lineStops = [
     long: 29.993453,
   },
   {
+    id: "k27",
     order: 27,
     name_ar: "نفق 45 على البحر",
     name_en: "45 Tunnel (Corniche)",

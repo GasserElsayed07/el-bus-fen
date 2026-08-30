@@ -14,6 +14,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { kourneshStops } from "@/features/shared/data/busStops";
+import { PencilLine } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useUserStore } from "@/store/userStore";
 import { marker } from "../types";
@@ -46,15 +47,24 @@ const createAmPmOptions = (): WheelPickerOption[] => [
 const createStopOptions = () =>
   kourneshStops.map((stop) => ({
     label: `${stop.order}. ${stop.name_en}`,
-    value: stop.name_en.toString(),
+    value: stop.id,
   }));
 
-export default function EntryForm({ setMarkers }: { setMarkers: any }) {
+export default function EntryForm({
+  setMarkers,
+  selectedStop,
+  setSelectedStop,
+}: {
+  setMarkers: any;
+  selectedStop: string | null;
+  setSelectedStop: (value: string | null) => void;
+}) {
   const hourOptions = useMemo(() => createHourOptions(), []);
   const minuteOptions = useMemo(() => createMinuteOptions(), []);
   const amPmOptions = useMemo(() => createAmPmOptions(), []);
   const stopOptions = useMemo(() => createStopOptions(), []);
-  const [selectedStop, setSelectedStop] = useState<string | null>("");
+  const [isEditingStop, setIsEditingStop] = useState(false);
+  const [draftBusStop, setDraftBusStop] = useState<string | null>(null);
   const [selectedHour, setSelectedHour] = useState<string | undefined>("7");
   const [selectedMinute, setSelectedMinute] = useState<string | undefined>(
     "14",
@@ -62,41 +72,90 @@ export default function EntryForm({ setMarkers }: { setMarkers: any }) {
   const [selectedAmPm, setSelectedAmPm] = useState<string | undefined>("AM");
 
   const user = useUserStore((state) => state.user);
+  const selectedStopData =
+    kourneshStops.find((stop) => stop.id === selectedStop) ?? null;
 
   function submitEntry() {
+    const selectedStopDetails =
+      kourneshStops.find((stop) => stop.id === selectedStop) ?? null;
+
+    if (!selectedStopDetails) {
+      return;
+    }
+
     console.log(" I fired submitEntry", {
       selectedHour,
       selectedMinute,
       selectedAmPm,
       selectedStop,
+      selectedStopDetails,
       user,
     });
     const newMarker: marker = {
       hour: Number(selectedHour ?? 0),
       minutes: Number(selectedMinute ?? 0),
-      lat: Number(user?.lat ?? 0),
-      long: Number(user?.long ?? 0),
+      lat: Number(selectedStopDetails.lat ?? 0),
+      long: Number(selectedStopDetails.long ?? 0),
     };
     setMarkers((prev: marker[]) => [...prev, newMarker]);
   }
 
   return (
     <div className="flex w-full flex-wrap items-end justify-center gap-2 p-2">
-      <Select
-        value={selectedStop}
-        onValueChange={(value) => setSelectedStop(value)}
-      >
-        <SelectTrigger className="w-full max-w-xs">
-          <SelectValue placeholder="Select a stop" />
-        </SelectTrigger>
-        <SelectContent>
-          {stopOptions.map((option) => (
-            <SelectItem key={option.value} value={option.value}>
-              {option.label}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+      <div className="flex w-full max-w-xs items-center gap-1.5">
+        {!isEditingStop ? (
+          <div className="flex h-8 w-full min-w-0 items-center justify-between rounded-lg border border-input bg-transparent px-2.5 py-2 text-sm whitespace-nowrap text-left text-foreground shadow-none">
+            <span className="line-clamp-1">
+              {selectedStopData
+                ? `${selectedStopData.order}. ${selectedStopData.name_en}`
+                : "Please select a bus stop"}
+            </span>
+          </div>
+        ) : (
+          <Select
+            value={draftBusStop ?? ""}
+            onValueChange={(value) => {
+              setDraftBusStop(value);
+              setSelectedStop(value);
+              setIsEditingStop(false);
+              console.log("draftBusStop", value);
+            }}
+          >
+            <SelectTrigger
+              className="w-full flex-1 min-w-0"
+              onSelect={(e) => {
+                e.stopPropagation();
+                console.log("SelectTrigger clicked" + e.target);
+              }}
+            >
+              <SelectValue placeholder="Please select a bus stop" />
+            </SelectTrigger>
+            <SelectContent>
+              {stopOptions.map((option) => (
+                <SelectItem key={option.value} value={option.value}>
+                  {option.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        )}
+
+        {!isEditingStop && (
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            aria-label="Edit bus stop"
+            className="h-8 w-8 rounded-md p-0 hover:bg-transparent"
+            onClick={() => {
+              setDraftBusStop(null);
+              setIsEditingStop(true);
+            }}
+          >
+            <PencilLine className="h-4 w-4" />
+          </Button>
+        )}
+      </div>
       <div className="flex w-full items-center justify-center gap-2 p-2">
         <WheelPickerWrapper className="w-fit max-w-xs border bg-transparent shadow-none">
           <WheelPicker

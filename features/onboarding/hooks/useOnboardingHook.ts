@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useUserStore } from "@/store/userStore";
+import { getCurrentUser } from "@/features/shared/apis/getUser";
 import { updateUserWithCustomFields } from "@/features/shared/repositories/user-repo";
 import { redirect } from "next/navigation";
 
@@ -12,14 +13,21 @@ export function useOnboarding() {
   // I need to add a soft debounce, that will save the current selected options after the user selects them after 1s.
   // timeout 1s -> user.save(currentStateOptions)
 
-  function handleNextStep() {
+  const setUser = useUserStore((state) => state.useUser);
+
+  async function refetchUserAndSaveToUserStore() {
+    const refreshedUser = await getCurrentUser();
+    setUser(refreshedUser ?? null);
+  }
+
+  async function handleNextStep() {
     let fieldsToUpdate;
     if (currentStep == 1) {
       // hard save the current route and stop options
       // currentStep++
       fieldsToUpdate = {
         busRoute: selectedRoute,
-        busStop: selectedStop,
+        busStopId: selectedStop,
       };
       setCurrentStep((prev) => prev + 1);
     }
@@ -28,11 +36,12 @@ export function useOnboarding() {
         name: name,
       };
     }
-    const response = updateUserWithCustomFields(
+    const response = await updateUserWithCustomFields(
       fieldsToUpdate ? fieldsToUpdate : {},
       user?._id,
     );
     console.log("the response from updateUserWithCustomFields: ", response);
+    await refetchUserAndSaveToUserStore();
     if (currentStep == 2) redirect("/");
   }
 
