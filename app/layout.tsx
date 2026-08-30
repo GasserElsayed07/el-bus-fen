@@ -5,7 +5,8 @@ import { GoogleOAuthProvider } from "@react-oauth/google";
 
 export const metadata: Metadata = {
   title: "El-Bus fen",
-  description: "",
+  description: "Answer the age old question, el bus fen?",
+  applicationName: "El-Bus Fen",
 };
 
 export default function RootLayout({
