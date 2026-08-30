@@ -61,6 +61,8 @@
 }
 
 :root {
+  --bottom-navbar-height: 2.5rem;
+
   --font-sf-pro:
     "SF Pro Display", "SF Pro Text", -apple-system, BlinkMacSystemFont,
     "Segoe UI", sans-serif;

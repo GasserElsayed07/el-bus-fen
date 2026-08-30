@@ -23,5 +23,9 @@ export default function UserStoreProvider({
     return <div>Loading...</div>;
   }
 
-  return <>{children}</>;
+  return (
+    <div className="min-h-screen">
+      <main className="min-h-screen">{children}</main>
+    </div>
+  );
 }

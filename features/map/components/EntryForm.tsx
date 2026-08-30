@@ -81,8 +81,23 @@ export default function EntryForm({ setMarkers }: { setMarkers: any }) {
   }
 
   return (
-    <div className="flex w-full flex-wrap items-center justify-center gap-2">
-      <div className="flex w-full items-center justify-between gap-2 p-2">
+    <div className="flex w-full flex-wrap items-end justify-center gap-2 p-2">
+      <Select
+        value={selectedStop}
+        onValueChange={(value) => setSelectedStop(value)}
+      >
+        <SelectTrigger className="w-full max-w-xs">
+          <SelectValue placeholder="Select a stop" />
+        </SelectTrigger>
+        <SelectContent>
+          {stopOptions.map((option) => (
+            <SelectItem key={option.value} value={option.value}>
+              {option.label}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+      <div className="flex w-full items-center justify-center gap-2 p-2">
         <WheelPickerWrapper className="w-fit max-w-xs border bg-transparent shadow-none">
           <WheelPicker
             options={hourOptions}
@@ -103,24 +118,8 @@ export default function EntryForm({ setMarkers }: { setMarkers: any }) {
             onValueChange={setSelectedAmPm}
           />
         </WheelPickerWrapper>
-
-        <Select
-          value={selectedStop}
-          onValueChange={(value) => setSelectedStop(value)}
-        >
-          <SelectTrigger className="w-full max-w-xs">
-            <SelectValue placeholder="Select a stop" />
-          </SelectTrigger>
-          <SelectContent>
-            {stopOptions.map((option) => (
-              <SelectItem key={option.value} value={option.value}>
-                {option.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
       </div>
-      <Button onClick={submitEntry} className="w-full" variant="outline">
+      <Button onClick={submitEntry} className="w-full" variant="secondary">
         submit
       </Button>
     </div>

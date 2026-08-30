@@ -7,7 +7,7 @@ import { getCurrentUser } from "@/features/shared/apis/getUser";
 
 export default function AuthLoadingPage() {
   const router = useRouter();
-  const setUser = useUserStore((state) => state.useUser);
+  // const setUser = useUserStore((state) => state.useUser);
 
   useEffect(() => {
     async function initializeUser() {
@@ -18,7 +18,7 @@ export default function AuthLoadingPage() {
         return;
       }
 
-      setUser(user);
+      // setUser(user);
 
       if (!user.onboarded) {
         router.replace("/onboarding");
@@ -28,7 +28,7 @@ export default function AuthLoadingPage() {
     }
 
     initializeUser();
-  }, [router, setUser]);
+  }, [router]);
 
-  return <div>Loading...</div>;
+  return <div>RedirectTemp: Loading...</div>;
 }

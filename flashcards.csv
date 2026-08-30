@@ -1,0 +1,3 @@
+"Why does a fixed footer need bottom space reserved in the page shell?","Fixed-position elements are removed from normal document flow, so the page needs matching bottom padding to prevent its last content from being hidden underneath the footer.","layout,navbar"
+"How are full-viewport authenticated pages sized with the fixed navbar?","Their viewport height uses `100dvh - 2.5rem`, matching the footer's `h-10` height, so the screen content ends above the navbar.","layout,navbar"
+"Where is the authenticated fixed navbar shell implemented?","In `store/UserStoreProvider.tsx`, which wraps authenticated children with a reserved main region and fixed footer navigation.","layout,navbar,auth"

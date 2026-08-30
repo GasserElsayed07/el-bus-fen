@@ -27,7 +27,7 @@ export default function Onboarding() {
   //   console.log("Detected selectedStop change:", selectedStop);
   // }, [selectedRoute, selectedStop]);
   return (
-    <div className="flex flex-col items-center justify-between pt-14 min-h-screen">
+    <div className="flex min-h-screen flex-col items-center justify-between pt-14">
       <div className="flex w-full items-center relative px-8 gap-2">
         <Button
           onClick={handleBackStep}
