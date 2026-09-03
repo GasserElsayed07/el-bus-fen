@@ -41,7 +41,7 @@ export async function addUser(userToBeAdded: UserType) {
 
 export async function updateUserWithCustomFields(
   toBeUpdatedFields: object,
-  userId,
+  userId: any,
 ) {
   try {
     await dbConnect();

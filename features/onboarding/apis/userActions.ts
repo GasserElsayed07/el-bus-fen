@@ -2,7 +2,7 @@
 import { dbConnect } from "@/features/shared/dbConnect";
 import { updateUserWithCustomFields } from "@/features/shared/repositories/user-repo";
 
-export async function setUserAsOnboarded(userId) {
+export async function setUserAsOnboarded({ userId }: { userId: any }) {
   try {
     await dbConnect();
     const response = updateUserWithCustomFields({ onboarded: true }, userId);
