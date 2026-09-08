@@ -1,6 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 
 const PUBLIC_FILE = /\.(.*)$/;
+const PUBLIC_ROUTES = new Set([
+  "/login",
+  "/privacy-policy",
+  "/terms-of-service",
+]);
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -18,7 +23,7 @@ export function middleware(request: NextRequest) {
   const token = request.cookies.get("auth-token");
   const isLoggedIn = !!token;
 
-  if (!isLoggedIn && pathname !== "/login") {
+  if (!isLoggedIn && !PUBLIC_ROUTES.has(pathname)) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
 

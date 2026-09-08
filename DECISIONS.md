@@ -31,3 +31,21 @@
 - `getCurrentUser` can return no user, so the store is updated with `null` in that case.
 
 **Key concepts:** `getCurrentUser`, Zustand synchronization, awaited persistence
+
+## Public Legal Pages for Google OAuth — 2026-09-08
+
+**What:** Added public privacy policy and terms of service pages for Google OAuth review.
+
+**Files involved:** `middleware.ts`, `features/legal/components/LegalDocument.tsx`, `features/legal/index.ts`, `app/privacy-policy/page.tsx`, `app/terms-of-service/page.tsx`
+
+**How it works:** `/privacy-policy` and `/terms-of-service` are explicitly allowed through the existing authentication middleware. Both server-rendered routes use the shared `LegalDocument` component and define page-specific metadata and legal sections. The privacy policy reflects the current flow: Google provides a verified sign-in credential, the app stores profile and bus preference fields, and a seven-day HTTP-only session cookie is created.
+
+**Why:** Google OAuth requires publicly reachable privacy and terms pages, while the app's middleware otherwise redirects every unauthenticated route to `/login`.
+
+**Gotchas:**
+
+- Add any future public route to `PUBLIC_ROUTES` or unauthenticated visitors will be redirected to `/login`.
+- Keep the privacy policy aligned with the actual Google token claims and user schema if authentication or stored profile data changes.
+- The legal copy is application-specific but is not a substitute for legal advice or a complete jurisdiction-specific privacy notice.
+
+**Key concepts:** public route allowlist, Google OAuth disclosure, shared legal component, page metadata
