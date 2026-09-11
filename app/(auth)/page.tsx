@@ -1,7 +1,11 @@
-"use client";
+import {
+  getBusEntryByFilter,
+  getLastSevenHoursBusEntries,
+} from "@/features/shared/repositories/bus-entry-repo";
 import Map from "@/features/map/Map";
+import { BusEntryType } from "@/features/shared/models/bus-entry";
 
-export default function Home() {
+export default async function Home() {
   // const setUser = useUserStore((state) => state.useUser);
   // const [locUser, setLocUser] = useState<UserDocument>();
   // useEffect(() => {
@@ -27,5 +31,8 @@ export default function Home() {
   //   manga();
   // }, []);
 
-  return <Map />;
+  // this filters the entries to only include those from the last 24 hours
+  const entryLogs = await getLastSevenHoursBusEntries();
+
+  return <Map entryLogs={entryLogs as BusEntryType[]} />;
 }

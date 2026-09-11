@@ -3,6 +3,8 @@ import { useUserStore } from "@/store/userStore";
 import { updateUserWithCustomFields } from "@/features/shared/repositories/user-repo";
 import { marker } from "./types";
 import { kourneshStops } from "../shared/data/busStops";
+import { socket } from "@/features/shared/socket";
+import { addBusEntry } from "../shared/repositories/bus-entry-repo";
 
 const dummyMarker = {
   hour: 7,
@@ -83,6 +85,50 @@ export function useMap() {
     };
   }, [selectedBusStop, setUser]);
 
+  async function submitEntry(
+    selectedHour: string | undefined,
+    selectedMinute: string | undefined,
+    selectedAmPm: string | undefined,
+  ) {
+    const selectedStopDetails =
+      kourneshStops.find((stop) => stop.id === selectedBusStop) ?? null;
+
+    if (!selectedStopDetails) {
+      return;
+    }
+
+    console.log(" I fired submitEntry", {
+      selectedHour,
+      selectedMinute,
+      selectedBusStop,
+      selectedStopDetails,
+      // user,
+    });
+
+    const newMarker: marker = {
+      hour: Number(selectedHour ?? 0),
+      minutes: Number(selectedMinute ?? 0),
+      lat: Number(selectedStopDetails.lat ?? 0),
+      long: Number(selectedStopDetails.long ?? 0),
+    };
+    const newBusEntry = await addBusEntry({
+      userId: user?._id ?? "",
+      selectedHour: selectedHour ?? "",
+      selectedMinute: selectedMinute ?? "",
+      selectedAmPm: selectedAmPm ?? "",
+      busRoute: user?.busRoute,
+      busStop: selectedBusStop as string,
+      lat: newMarker.lat,
+      long: newMarker.long,
+    });
+    if (!newBusEntry) {
+      return;
+    }
+    console.log("entry log created: ", newBusEntry);
+    socket.emit("newEntry", newMarker);
+    setEntries((prev: marker[]) => [...prev, newMarker]);
+  }
+
   return {
     busStopMarkers,
     setBusStopMarkers,
@@ -94,5 +140,6 @@ export function useMap() {
     setDialogOpen,
     selectedBusStop,
     setSelectedBusStop,
+    submitEntry,
   };
 }

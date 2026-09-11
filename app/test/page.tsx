@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { socket } from "@/features/shared/socket";
 
 export default function TestCountersPage() {
   const [countK, setCountK] = useState(0);
@@ -10,9 +11,11 @@ export default function TestCountersPage() {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "k") {
         setCountK((current) => current + 1);
+        socket.emit("test-k", "k was pressed");
       }
       if (event.key === "l") {
         setCountL((current) => current + 1);
+        socket.emit("test-l", "l was pressed");
       }
     };
 

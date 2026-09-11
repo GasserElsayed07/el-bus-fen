@@ -16,8 +16,12 @@ import {
 import { kourneshStops } from "@/features/shared/data/busStops";
 import { PencilLine } from "lucide-react";
 import { useMemo, useState } from "react";
-import { useUserStore } from "@/store/userStore";
-import { marker } from "../types";
+
+type SubmitEntry = (
+  selectedHour: string | undefined,
+  selectedMinute: string | undefined,
+  selectedAmPm: string | undefined,
+) => void;
 
 const createHourOptions = (): WheelPickerOption[] =>
   Array.from({ length: 12 }, (_, index) => {
@@ -51,11 +55,11 @@ const createStopOptions = () =>
   }));
 
 export default function EntryForm({
-  setMarkers,
+  submitEntry,
   selectedStop,
   setSelectedStop,
 }: {
-  setMarkers: any;
+  submitEntry: SubmitEntry;
   selectedStop: string | null;
   setSelectedStop: (value: string | null) => void;
 }) {
@@ -71,33 +75,12 @@ export default function EntryForm({
   );
   const [selectedAmPm, setSelectedAmPm] = useState<string | undefined>("AM");
 
-  const user = useUserStore((state) => state.user);
+  // const user = useUserStore((state) => state.user);
   const selectedStopData =
     kourneshStops.find((stop) => stop.id === selectedStop) ?? null;
 
-  function submitEntry() {
-    const selectedStopDetails =
-      kourneshStops.find((stop) => stop.id === selectedStop) ?? null;
-
-    if (!selectedStopDetails) {
-      return;
-    }
-
-    console.log(" I fired submitEntry", {
-      selectedHour,
-      selectedMinute,
-      selectedAmPm,
-      selectedStop,
-      selectedStopDetails,
-      user,
-    });
-    const newMarker: marker = {
-      hour: Number(selectedHour ?? 0),
-      minutes: Number(selectedMinute ?? 0),
-      lat: Number(selectedStopDetails.lat ?? 0),
-      long: Number(selectedStopDetails.long ?? 0),
-    };
-    setMarkers((prev: marker[]) => [...prev, newMarker]);
+  function handleOnSubmit() {
+    submitEntry(selectedHour, selectedMinute, selectedAmPm);
   }
 
   return (
@@ -178,7 +161,7 @@ export default function EntryForm({
           />
         </WheelPickerWrapper>
       </div>
-      <Button onClick={submitEntry} className="w-full" variant="secondary">
+      <Button onClick={handleOnSubmit} className="w-full" variant="secondary">
         submit
       </Button>
     </div>
