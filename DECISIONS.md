@@ -109,3 +109,29 @@
 **Gotchas:** `UTC_OFFSET` must be available to the server as a finite numeric value. The persisted value is UTC, so client rendering must apply the desired display timezone when showing it as a clock time.
 
 **Key concepts:** UTC normalization, server environment variables, 12-hour time conversion, absolute timestamps
+
+## Direct Onboarding Route and Stop Selectors — 2026-09-11
+
+**What:** Replaced the outdated shared `StopsSelector` abstraction with direct route and stop selectors in `FirstPage`.
+
+**Files involved:** `features/onboarding/components/FirstPage.tsx`, `features/shared/components/StopsSelector.tsx`
+
+**How it works:** The route selector stores `route.name_en`, matching the current route data shape. The stop selector stores `stop.id` and displays the stop order and English name. Setter props are typed with React state dispatch types.
+
+**Why:** Routes and stops no longer share the same data format, so one selector component was incorrectly modeling both entities.
+
+**Gotchas:** Route values are names because the current route data has no IDs; stop values remain stable stop IDs.
+
+**Key concepts:** direct composition, typed state setters, route/stop data shapes
+
+## Filter Map Entries by User Route — 2026-09-11
+
+**What:** Map entries are now limited to the authenticated user's selected bus route.
+
+**Files involved:** `features/map/Map.tsx`, `features/map/types.ts`, `features/map/useMapHook.ts`
+
+**How it works:** Persisted entries are filtered by `entry.busRoute` before becoming markers. Realtime markers now carry `busRoute` and are rejected when they do not match the current user's route. The map clears entries when no route is selected.
+
+**Gotchas:** Realtime marker payloads must retain `busRoute`; otherwise clients cannot safely filter socket events by route.
+
+**Key concepts:** route-scoped rendering, realtime filtering, marker payloads

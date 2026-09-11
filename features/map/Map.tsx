@@ -16,6 +16,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import Markers from "./components/Markers";
+import { useUserStore } from "@/store/userStore";
+import { kourneshStops } from "../shared/data/busStops";
 
 export default function Map({ entryLogs }: { entryLogs: BusEntryType[] }) {
   const {
@@ -32,36 +34,33 @@ export default function Map({ entryLogs }: { entryLogs: BusEntryType[] }) {
     submitEntry,
   } = useMap();
 
+  const user = useUserStore((state) => state.user);
+
   useEffect(() => {
-    console.log(
-      "Initial entry logs:",
-      entryLogs,
-      entryLogs && entryLogs.length > 0,
-    );
+    if (entryLogs && entryLogs.length > 0 && user?.busRoute) {
+      const newEntries: marker[] = entryLogs
+        .filter((entry) => entry.busRoute === user.busRoute)
+        .flatMap((entry) => {
+          const entryTime = new Date(String(entry.time));
 
-    if (entryLogs && entryLogs.length > 0) {
-      const newEntries: marker[] = entryLogs.flatMap((entry) => {
-        const entryTime = new Date(String(entry.time));
+          if (Number.isNaN(entryTime.getTime())) {
+            console.error("Skipping bus entry with an invalid time:", entry);
+            return [];
+          }
 
-        if (Number.isNaN(entryTime.getTime())) {
-          console.error("Skipping bus entry with an invalid time:", entry);
-          return [];
-        }
-
-        return [
-          {
-            lat: entry.lat,
-            long: entry.long,
-            hour: entryTime.getHours(),
-            minutes: entryTime.getMinutes(),
-          },
-        ];
-      });
-      console.log("Adding new entries to state:", newEntries);
+          return [
+            {
+              lat: entry.lat,
+              long: entry.long,
+              hour: entryTime.getHours(),
+              minutes: entryTime.getMinutes(),
+              busRoute: entry.busRoute,
+            },
+          ];
+        });
       setEntries((prevEntries) => [...prevEntries, ...newEntries]);
     }
     const handleIncomingEntry = (newMarker: marker) => {
-      console.log("Received new entry:", newMarker);
       setEntries((prevEntries) => [...prevEntries, newMarker]);
     };
 
@@ -70,7 +69,7 @@ export default function Map({ entryLogs }: { entryLogs: BusEntryType[] }) {
     return () => {
       socket.off("newEntry", handleIncomingEntry);
     };
-  }, []);
+  }, [entryLogs, setEntries, user?.busRoute]);
   return (
     <>
       <div className="flex h-[calc(100dvh-var(--bottom-navbar-height))] flex-col items-center justify-between pb-2">
@@ -92,25 +91,34 @@ export default function Map({ entryLogs }: { entryLogs: BusEntryType[] }) {
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogContent className="">
             <DialogHeader>
-              <DialogTitle>Bus Report</DialogTitle>
+              <DialogTitle>
+                Bus Report
+                <span className="font-normal ">
+                  {" - "}
+                  {selectedMarker?.hour}:
+                  {selectedMarker?.minutes.toString().padStart(2, "0")} AM
+                </span>
+              </DialogTitle>
             </DialogHeader>
 
             {selectedMarker && (
               <div className="space-y-3">
                 <div>
-                  <span className="font-semibold">Reported by:</span> Ahmed
-                  Mohamed
+                  <span className="font-semibold">Reported by:</span>{" "}
+                  {user?.name ?? "Unknown User"}
                 </div>
 
                 <div>
-                  <span className="font-semibold">Time:</span>{" "}
-                  {selectedMarker.hour}:
-                  {selectedMarker.minutes.toString().padStart(2, "0")} AM
+                  <span className="font-semibold">Bus Stop:</span>{" "}
+                  {kourneshStops.find((stop) => stop.lat === selectedMarker.lat)
+                    ?.name_en ?? "Unknown Stop"}
                 </div>
 
                 <div>
-                  <span className="font-semibold">Minutes ago:</span>{" "}
-                  {getMinutesAgo(selectedMarker)}
+                  <span className="font-semibold">
+                    {" "}
+                    {getMinutesAgo(selectedMarker)} minutes ago
+                  </span>{" "}
                 </div>
               </div>
             )}

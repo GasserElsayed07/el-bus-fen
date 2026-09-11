@@ -6,12 +6,12 @@ import { kourneshStops } from "../shared/data/busStops";
 import { socket } from "@/features/shared/socket";
 import { addBusEntry } from "../shared/repositories/bus-entry-repo";
 
-const dummyMarker = {
-  hour: 7,
-  minutes: 21,
-  lat: 31.253032,
-  long: 29.972749,
-};
+// const dummyMarker = {
+//   hour: 7,
+//   minutes: 21,
+//   lat: 31.253032,
+//   long: 29.972749,
+// };
 
 export function createMarkers(
   busStops: Array<{ lat: number; long: number }>,
@@ -41,7 +41,7 @@ export function useMap() {
     userRef.current = user;
   }, [user]);
 
-  const [entries, setEntries] = useState<marker[]>([dummyMarker]);
+  const [entries, setEntries] = useState<marker[]>([]);
   const [busStopMarkers, setBusStopMarkers] = useState<marker[]>(
     createMarkers(kourneshStops),
   );
@@ -110,6 +110,7 @@ export function useMap() {
       minutes: Number(selectedMinute ?? 0),
       lat: Number(selectedStopDetails.lat ?? 0),
       long: Number(selectedStopDetails.long ?? 0),
+      busRoute: user?.busRoute,
     };
     const newBusEntry = await addBusEntry({
       userId: user?._id ?? "",

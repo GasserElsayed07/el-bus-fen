@@ -3,4 +3,5 @@ export type marker = {
   minutes: number;
   lat: number;
   long: number;
+  busRoute?: string;
 };

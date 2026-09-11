@@ -21,3 +21,7 @@
 "Where is the selected bus time converted using `UTC_OFFSET`?","Inside the server-side `addBusEntry` flow in `features/shared/repositories/bus-entry-repo.ts`, keeping the environment variable out of client code.","bus-entry,utc,nextjs"
 "How is a selected 12-hour bus time stored?","The repository converts hour/AM-PM to 24-hour time, builds today's local date using the configured offset, subtracts that offset, and stores the resulting UTC `Date`.","bus-entry,datetime,utc"
 "What does `UTC_OFFSET=3` mean for a selected 7:14 AM entry?","The stored instant is `04:14Z`; the user selected 7:14 in the UTC+3 local clock, and the database stores the equivalent UTC instant.","bus-entry,utc,example"
+"Why was `StopsSelector` removed from onboarding?","Routes and stops have different data shapes, so `FirstPage` now renders separate selectors tailored to each entity.","onboarding,selectors,architecture"
+"What values do the onboarding selectors store?","The route selector stores `route.name_en`, while the stop selector stores the stable `stop.id`.","onboarding,routes,bus-stops"
+"How does the map restrict entries to the current user?","It filters persisted entries and realtime markers by matching `busRoute` with the authenticated user's selected route.","map,bus-entry,routing"
+"Why does the transient map marker include `busRoute`?","Realtime socket clients need the route on each marker to reject entries belonging to other bus routes before rendering them.","map,socket,filtering"
