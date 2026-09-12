@@ -6,9 +6,7 @@ import EntryForm from "./components/EntryForm";
 import { useMap } from "./useMapHook";
 import { getMinutesAgo } from "./utils";
 import BottomNavbar from "@/features/bottom-navbar";
-// import {socket} from "@/features/shared/socket";
-import { createSocket } from "@/features/shared/socket";
-import type { entry, marker } from "./types";
+import type { entry } from "./types";
 import type { BusEntryType } from "@/features/shared/models/bus-entry";
 import {
   Dialog,
@@ -24,7 +22,6 @@ import { kourneshStops } from "../shared/data/busStops";
 export default function Map({ entryLogs }: { entryLogs: BusEntryType[] }) {
   const {
     busStopMarkers,
-    setBusStopMarkers,
     selectedEntry,
     setSelectedEntry,
     entries,
@@ -39,77 +36,39 @@ export default function Map({ entryLogs }: { entryLogs: BusEntryType[] }) {
   const selectedBusStopData = kourneshStops.find(
     (stop) => stop.id === selectedBusStop,
   );
+
   const user = useUserStore((state) => state.user);
 
+  // Process entries fetched from the database
   useEffect(() => {
-    if (entryLogs && entryLogs.length > 0 && user?.busRoute) {
-      const newEntries: entry[] = entryLogs
-        .filter((entry) => entry.busRoute === user.busRoute)
-        .flatMap((entry) => {
-          const entryTime = new Date(String(entry.time));
-
-          if (Number.isNaN(entryTime.getTime())) {
-            console.error("Skipping bus entry with an invalid time:", entry);
-            return [];
-          }
-
-          return [
-            {
-              lat: entry.lat,
-              long: entry.long,
-              hour: entryTime.getHours(),
-              minutes: entryTime.getMinutes(),
-              busRoute: entry.busRoute,
-            },
-          ];
-        });
-      setEntries((prevEntries) => [...prevEntries, ...newEntries]);
+    if (!entryLogs || entryLogs.length === 0 || !user?.busRoute) {
+      return;
     }
 
-    const socket = createSocket();
-    const handleIncomingEntry = (event: MessageEvent) => {
-      const message = JSON.parse(event.data);
+    const newEntries: entry[] = entryLogs
+      .filter((entry) => entry.busRoute === user.busRoute)
+      .flatMap((entry) => {
+        const entryTime = new Date(String(entry.time));
 
-      if (message.type !== "newEntry") {
-        return;
-      }
+        if (Number.isNaN(entryTime.getTime())) {
+          console.error("Skipping bus entry with an invalid time:", entry);
+          return [];
+        }
 
-      const newEntry: entry = message.marker;
+        return [
+          {
+            lat: entry.lat,
+            long: entry.long,
+            hour: entryTime.getHours(),
+            minutes: entryTime.getMinutes(),
+            busRoute: entry.busRoute,
+          },
+        ];
+      });
 
-      setEntries((prevEntries) => [...prevEntries, newEntry]);
-    };
-
-    socket.addEventListener("message", handleIncomingEntry);
-
-    return () => {
-      socket.removeEventListener("message", handleIncomingEntry);
-      socket.close();
-    };
+    setEntries((prevEntries) => [...prevEntries, ...newEntries]);
   }, [entryLogs, setEntries, user?.busRoute]);
 
-  useEffect(() => {
-    const socket = createSocket();
-
-    socket.addEventListener("open", () => {
-      console.log("CONNECTED TO WEBSOCKET");
-    });
-
-    socket.addEventListener("message", (event) => {
-      console.log("RECEIVED FROM SERVER:", event.data);
-    });
-
-    socket.addEventListener("close", () => {
-      console.log("WEBSOCKET CLOSED");
-    });
-
-    socket.addEventListener("error", (error) => {
-      console.error("WEBSOCKET ERROR:", error);
-    });
-
-    return () => {
-      socket.close();
-    };
-  }, []);
   return (
     <>
       <div className="flex h-[calc(100dvh-var(--bottom-navbar-height))] flex-col items-center justify-between pb-2">
@@ -134,11 +93,11 @@ export default function Map({ entryLogs }: { entryLogs: BusEntryType[] }) {
         </MapContainer>
 
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-          <DialogContent className="">
+          <DialogContent>
             <DialogHeader>
               <DialogTitle>
                 Bus Report
-                <span className="font-normal ">
+                <span className="font-normal">
                   {" - "}
                   {selectedEntry?.hour}:
                   {selectedEntry?.minutes.toString().padStart(2, "0")} AM
@@ -161,9 +120,8 @@ export default function Map({ entryLogs }: { entryLogs: BusEntryType[] }) {
 
                 <div>
                   <span className="font-semibold">
-                    {" "}
                     {getMinutesAgo(selectedEntry)} minutes ago
-                  </span>{" "}
+                  </span>
                 </div>
               </div>
             )}
@@ -176,6 +134,7 @@ export default function Map({ entryLogs }: { entryLogs: BusEntryType[] }) {
           setSelectedStop={setSelectedBusStop}
         />
       </div>
+
       <BottomNavbar />
     </>
   );

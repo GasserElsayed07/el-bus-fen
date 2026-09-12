@@ -6,13 +6,6 @@ import { kourneshStops } from "../shared/data/busStops";
 import { createSocket } from "@/features/shared/socket";
 import { addBusEntry } from "../shared/repositories/bus-entry-repo";
 
-// const dummyMarker = {
-//   hour: 7,
-//   minutes: 21,
-//   lat: 31.253032,
-//   long: 29.972749,
-// };
-
 export function createMarkers(
   busStops: Array<{ lat: number; long: number }>,
 ): marker[] {
@@ -33,18 +26,24 @@ export function createMarkers(
 export function useMap() {
   const user = useUserStore((state) => state.user);
   const setUser = useUserStore((state) => state.useUser);
+
   const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const lastSyncedBusStopRef = useRef<string | null>(user?.busStopId ?? null);
   const userRef = useRef(user);
+
+  // The one WebSocket connection owned by this hook
+  const socketRef = useRef<WebSocket | null>(null);
 
   useEffect(() => {
     userRef.current = user;
   }, [user]);
 
   const [entries, setEntries] = useState<entry[]>([]);
+
   const [busStopMarkers, setBusStopMarkers] = useState<marker[]>(
     createMarkers(kourneshStops),
   );
+
   const [selectedBusStop, setSelectedBusStop] = useState<string | null>(
     () => user?.busStopId ?? null,
   );
@@ -52,6 +51,7 @@ export function useMap() {
   const [selectedEntry, setSelectedEntry] = useState<entry | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
 
+  // Sync selected bus stop to the user
   useEffect(() => {
     const currentUser = userRef.current;
 
@@ -64,7 +64,11 @@ export function useMap() {
     }
 
     lastSyncedBusStopRef.current = selectedBusStop;
-    setUser({ ...currentUser, busStopId: selectedBusStop });
+
+    setUser({
+      ...currentUser,
+      busStopId: selectedBusStop,
+    });
 
     if (saveTimeoutRef.current) {
       clearTimeout(saveTimeoutRef.current);
@@ -85,6 +89,42 @@ export function useMap() {
     };
   }, [selectedBusStop, setUser]);
 
+  // Create and maintain the WebSocket connection
+  useEffect(() => {
+    const socket = createSocket();
+
+    socketRef.current = socket;
+
+    socket.addEventListener("open", () => {
+      console.log("CONNECTED TO WEBSOCKET");
+    });
+
+    socket.addEventListener("message", (event) => {
+      const message = JSON.parse(event.data);
+
+      if (message.type !== "newEntry") {
+        return;
+      }
+
+      const newEntry: entry = message.entry;
+
+      setEntries((prevEntries) => [...prevEntries, newEntry]);
+    });
+
+    socket.addEventListener("close", () => {
+      console.log("WEBSOCKET CLOSED");
+    });
+
+    socket.addEventListener("error", (error) => {
+      console.error("WEBSOCKET ERROR:", error);
+    });
+
+    return () => {
+      socket.close();
+      socketRef.current = null;
+    };
+  }, []);
+
   async function submitEntry(
     selectedHour: string | undefined,
     selectedMinute: string | undefined,
@@ -97,12 +137,11 @@ export function useMap() {
       return;
     }
 
-    console.log(" I fired submitEntry", {
+    console.log("I fired submitEntry", {
       selectedHour,
       selectedMinute,
       selectedBusStop,
       selectedStopDetails,
-      // user,
     });
 
     const newEntry: entry = {
@@ -112,6 +151,7 @@ export function useMap() {
       long: Number(selectedStopDetails.long ?? 0),
       busRoute: user?.busRoute,
     };
+
     const newBusEntry = await addBusEntry({
       userId: user?._id ?? "",
       selectedHour: selectedHour ?? "",
@@ -122,18 +162,28 @@ export function useMap() {
       lat: newEntry.lat,
       long: newEntry.long,
     });
+
     if (!newBusEntry) {
       return;
     }
-    console.log("entry log created: ", newBusEntry);
-    const socket = createSocket();
-    socket.send(
-      JSON.stringify({
-        type: "newEntry",
-        entry: newEntry,
-      }),
-    );
-    setEntries((prev: entry[]) => [...prev, newEntry]);
+
+    console.log("entry log created:", newBusEntry);
+
+    const socket = socketRef.current;
+
+    if (socket?.readyState === WebSocket.OPEN) {
+      socket.send(
+        JSON.stringify({
+          type: "newEntry",
+          entry: newEntry,
+        }),
+      );
+    } else {
+      console.log("WebSocket is not connected yet");
+    }
+
+    // Show the entry immediately to the user who submitted it
+    setEntries((prevEntries) => [...prevEntries, newEntry]);
   }
 
   return {
