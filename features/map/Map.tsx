@@ -8,7 +8,7 @@ import { getMinutesAgo } from "./utils";
 import BottomNavbar from "@/features/bottom-navbar";
 // import {socket} from "@/features/shared/socket";
 import { createSocket } from "@/features/shared/socket";
-import type { marker } from "./types";
+import type { entry, marker } from "./types";
 import type { BusEntryType } from "@/features/shared/models/bus-entry";
 import {
   Dialog,
@@ -25,8 +25,8 @@ export default function Map({ entryLogs }: { entryLogs: BusEntryType[] }) {
   const {
     busStopMarkers,
     setBusStopMarkers,
-    selectedMarker,
-    setSelectedMarker,
+    selectedEntry,
+    setSelectedEntry,
     entries,
     setEntries,
     dialogOpen,
@@ -43,7 +43,7 @@ export default function Map({ entryLogs }: { entryLogs: BusEntryType[] }) {
 
   useEffect(() => {
     if (entryLogs && entryLogs.length > 0 && user?.busRoute) {
-      const newEntries: marker[] = entryLogs
+      const newEntries: entry[] = entryLogs
         .filter((entry) => entry.busRoute === user.busRoute)
         .flatMap((entry) => {
           const entryTime = new Date(String(entry.time));
@@ -65,8 +65,8 @@ export default function Map({ entryLogs }: { entryLogs: BusEntryType[] }) {
         });
       setEntries((prevEntries) => [...prevEntries, ...newEntries]);
     }
-    const handleIncomingEntry = (newMarker: marker) => {
-      setEntries((prevEntries) => [...prevEntries, newMarker]);
+    const handleIncomingEntry = (newEntry: entry) => {
+      setEntries((prevEntries) => [...prevEntries, newEntry]);
     };
 
     // socket.on("newEntry", handleIncomingEntry);
@@ -117,7 +117,7 @@ export default function Map({ entryLogs }: { entryLogs: BusEntryType[] }) {
           <Markers
             markers={busStopMarkers}
             entries={entries}
-            setSelectedMarker={setSelectedMarker}
+            setSelectedEntry={setSelectedEntry}
             setDialogOpen={setDialogOpen}
           />
         </MapContainer>
@@ -129,13 +129,13 @@ export default function Map({ entryLogs }: { entryLogs: BusEntryType[] }) {
                 Bus Report
                 <span className="font-normal ">
                   {" - "}
-                  {selectedMarker?.hour}:
-                  {selectedMarker?.minutes.toString().padStart(2, "0")} AM
+                  {selectedEntry?.hour}:
+                  {selectedEntry?.minutes.toString().padStart(2, "0")} AM
                 </span>
               </DialogTitle>
             </DialogHeader>
 
-            {selectedMarker && (
+            {selectedEntry && (
               <div className="space-y-3">
                 <div>
                   <span className="font-semibold">Reported by:</span>{" "}
@@ -144,14 +144,14 @@ export default function Map({ entryLogs }: { entryLogs: BusEntryType[] }) {
 
                 <div>
                   <span className="font-semibold">Bus Stop:</span>{" "}
-                  {kourneshStops.find((stop) => stop.lat === selectedMarker.lat)
+                  {kourneshStops.find((stop) => stop.lat === selectedEntry.lat)
                     ?.name_en ?? "Unknown Stop"}
                 </div>
 
                 <div>
                   <span className="font-semibold">
                     {" "}
-                    {getMinutesAgo(selectedMarker)} minutes ago
+                    {getMinutesAgo(selectedEntry)} minutes ago
                   </span>{" "}
                 </div>
               </div>
