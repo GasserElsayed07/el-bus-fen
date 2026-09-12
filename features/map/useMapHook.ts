@@ -3,7 +3,7 @@ import { useUserStore } from "@/store/userStore";
 import { updateUserWithCustomFields } from "@/features/shared/repositories/user-repo";
 import { entry, marker } from "./types";
 import { kourneshStops } from "../shared/data/busStops";
-// import { socket } from "@/features/shared/socket";
+import { createSocket } from "@/features/shared/socket";
 import { addBusEntry } from "../shared/repositories/bus-entry-repo";
 
 // const dummyMarker = {
@@ -126,7 +126,8 @@ export function useMap() {
       return;
     }
     console.log("entry log created: ", newBusEntry);
-    // socket.send(
+    const socket = createSocket();
+    socket.send(
       JSON.stringify({
         type: "newEntry",
         entry: newEntry,

@@ -21,6 +21,18 @@ export function GET() {
       }
     });
 
+    ws.on("message", (data) => {
+      const message = JSON.parse(data.toString());
+
+      if (message.type === "newEntry") {
+        for (const client of clients) {
+          if (client !== ws && client.readyState === 1) {
+            client.send(JSON.stringify(message));
+          }
+        }
+      }
+    });
+
     ws.on("close", () => {
       clients.delete(ws);
     });

@@ -65,14 +65,25 @@ export default function Map({ entryLogs }: { entryLogs: BusEntryType[] }) {
         });
       setEntries((prevEntries) => [...prevEntries, ...newEntries]);
     }
-    const handleIncomingEntry = (newEntry: entry) => {
+
+    const socket = createSocket();
+    const handleIncomingEntry = (event: MessageEvent) => {
+      const message = JSON.parse(event.data);
+
+      if (message.type !== "newEntry") {
+        return;
+      }
+
+      const newEntry: entry = message.marker;
+
       setEntries((prevEntries) => [...prevEntries, newEntry]);
     };
 
-    // socket.on("newEntry", handleIncomingEntry);
+    socket.addEventListener("message", handleIncomingEntry);
 
     return () => {
-      // socket.off("newEntry", handleIncomingEntry);
+      socket.removeEventListener("message", handleIncomingEntry);
+      socket.close();
     };
   }, [entryLogs, setEntries, user?.busRoute]);
 
