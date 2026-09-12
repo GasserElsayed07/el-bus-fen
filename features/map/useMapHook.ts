@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useUserStore } from "@/store/userStore";
 import { updateUserWithCustomFields } from "@/features/shared/repositories/user-repo";
-import { marker } from "./types";
+import { entry, marker } from "./types";
 import { kourneshStops } from "../shared/data/busStops";
 import { socket } from "@/features/shared/socket";
 import { addBusEntry } from "../shared/repositories/bus-entry-repo";
@@ -41,7 +41,7 @@ export function useMap() {
     userRef.current = user;
   }, [user]);
 
-  const [entries, setEntries] = useState<marker[]>([]);
+  const [entries, setEntries] = useState<entry[]>([]);
   const [busStopMarkers, setBusStopMarkers] = useState<marker[]>(
     createMarkers(kourneshStops),
   );
@@ -49,7 +49,7 @@ export function useMap() {
     () => user?.busStopId ?? null,
   );
 
-  const [selectedMarker, setSelectedMarker] = useState<marker | null>(null);
+  const [selectedEntry, setSelectedEntry] = useState<entry | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
 
   useEffect(() => {
@@ -105,7 +105,7 @@ export function useMap() {
       // user,
     });
 
-    const newMarker: marker = {
+    const newEntry: entry = {
       hour: Number(selectedHour ?? 0),
       minutes: Number(selectedMinute ?? 0),
       lat: Number(selectedStopDetails.lat ?? 0),
@@ -119,22 +119,27 @@ export function useMap() {
       selectedAmPm: selectedAmPm ?? "",
       busRoute: user?.busRoute,
       busStop: selectedBusStop as string,
-      lat: newMarker.lat,
-      long: newMarker.long,
+      lat: newEntry.lat,
+      long: newEntry.long,
     });
     if (!newBusEntry) {
       return;
     }
     console.log("entry log created: ", newBusEntry);
-    socket.emit("newEntry", newMarker);
-    setEntries((prev: marker[]) => [...prev, newMarker]);
+    socket.send(
+      JSON.stringify({
+        type: "newEntry",
+        entry: newEntry,
+      }),
+    );
+    setEntries((prev: entry[]) => [...prev, newEntry]);
   }
 
   return {
     busStopMarkers,
     setBusStopMarkers,
-    selectedMarker,
-    setSelectedMarker,
+    selectedEntry,
+    setSelectedEntry,
     entries,
     setEntries,
     dialogOpen,

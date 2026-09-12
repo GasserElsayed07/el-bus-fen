@@ -1,6 +1,6 @@
 "use client";
 
-import { marker } from "../types";
+import { entry, marker } from "../types";
 import { Marker, Tooltip } from "react-leaflet";
 import L from "leaflet";
 import { getMinutesAgo } from "../utils";
@@ -36,27 +36,27 @@ const icon = busEntryIcon;
 export default function Markers({
   markers,
   entries,
-  setSelectedMarker,
+  setSelectedEntry,
   setDialogOpen,
 }: {
   markers: marker[];
-  entries: marker[]; // Replace 'any' with the actual type for entries
-  setSelectedMarker: (marker: marker | null) => void;
+  entries: entry[]; // Replace 'any' with the actual type for entries
+  setSelectedEntry: (entry: entry | null) => void;
   setDialogOpen: (open: boolean) => void;
 }) {
   const user = useUserStore((state) => state.user);
 
   return (
     <div>
-      {entries.map((marker, i) => (
+      {entries.map((entry, i) => (
         <Marker
-          key={i + marker.lat}
-          position={[marker.lat, marker.long]}
+          key={i + entry.lat}
+          position={[entry.lat, entry.long]}
           icon={icon}
           opacity={0}
           eventHandlers={{
             click: () => {
-              setSelectedMarker(marker);
+              setSelectedEntry(entry);
               setDialogOpen(true);
             },
           }}
@@ -68,13 +68,13 @@ export default function Markers({
             className="rounded-lg text-[0.5rem] font-bold text-black"
             eventHandlers={{
               click: () => {
-                setSelectedMarker(marker);
+                setSelectedEntry(entry);
                 setDialogOpen(true);
               },
             }}
           >
-            <div>{`${getMinutesAgo(marker)} minutes ago`}</div>
-            {/* <div>{`${marker.hour}:${marker.minutes
+            <div>{`${getMinutesAgo(entry)} minutes ago`}</div>
+            {/* <div>{`${entry.hour}:${entry.minutes
                             .toString()
                             .padStart(2, "0")} AM`}</div> */}
           </Tooltip>
