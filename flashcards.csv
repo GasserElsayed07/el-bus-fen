@@ -25,3 +25,6 @@
 "What values do the onboarding selectors store?","The route selector stores `route.name_en`, while the stop selector stores the stable `stop.id`.","onboarding,routes,bus-stops"
 "How does the map restrict entries to the current user?","It filters persisted entries and realtime markers by matching `busRoute` with the authenticated user's selected route.","map,bus-entry,routing"
 "Why does the transient map marker include `busRoute`?","Realtime socket clients need the route on each marker to reject entries belonging to other bus routes before rendering them.","map,socket,filtering"
+"How does the map recenter when a bus stop is selected?","`features/map/components/RecenterMap.tsx` uses React Leaflet's `useMap()` hook and calls Leaflet `flyTo` with the selected stop coordinates while preserving the current zoom.","map,react-leaflet,animation"
+"Why does the map use `flyTo` instead of changing `MapContainer.center`?","`MapContainer.center` initializes the map but does not reliably update an existing instance. `flyTo` responds to later selection changes and animates the movement without remounting the map.","map,react-leaflet,flyto"
+"What is the gotcha with `RecenterMap`?","It must render inside `MapContainer` so React Leaflet's map context is available; forcing a `MapContainer` remount would reset zoom and interaction state.","map,react-leaflet,context"

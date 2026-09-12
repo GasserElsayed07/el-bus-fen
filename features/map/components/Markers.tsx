@@ -4,6 +4,8 @@ import { marker } from "../types";
 import { Marker, Tooltip } from "react-leaflet";
 import L from "leaflet";
 import { getMinutesAgo } from "../utils";
+import { useUserStore } from "@/store/userStore";
+import { kourneshStops } from "@/features/shared/data/busStops";
 
 const busEntryIcon = L.icon({
   iconUrl: "/icons/mapMarker.png",
@@ -12,9 +14,15 @@ const busEntryIcon = L.icon({
 });
 
 const busStopIcon = L.icon({
-  iconUrl: "/icons/busStopIcon.png",
-  iconSize: [32, 32],
-  iconAnchor: [20, 32],
+  iconUrl: "/icons/bus_stop_marker.png",
+  iconSize: [26, 32],
+  iconAnchor: [18.5, 32],
+});
+
+const yourStopMarkerIcon = L.icon({
+  iconUrl: "/icons/your_stop_marker.png",
+  iconSize: [38, 44],
+  iconAnchor: [22, 40],
 });
 
 const busIcon = L.icon({
@@ -36,6 +44,8 @@ export default function Markers({
   setSelectedMarker: (marker: marker | null) => void;
   setDialogOpen: (open: boolean) => void;
 }) {
+  const user = useUserStore((state) => state.user);
+
   return (
     <div>
       {entries.map((marker, i) => (
@@ -70,13 +80,34 @@ export default function Markers({
           </Tooltip>
         </Marker>
       ))}
-      {markers.map((entry, i) => (
-        <Marker
-          key={i + entry.lat}
-          position={[entry.lat, entry.long]}
-          icon={busStopIcon}
-        ></Marker>
-      ))}
+      {markers.map((entry, i) => {
+        const isUserStop =
+          kourneshStops.find(
+            (stop) => stop.lat === entry.lat && stop.long === entry.long,
+          )?.id === user?.busStopId;
+
+        return (
+          <Marker
+            key={i + entry.lat}
+            position={[entry.lat, entry.long]}
+            icon={isUserStop ? yourStopMarkerIcon : busStopIcon}
+          >
+            {isUserStop && (
+              <Tooltip
+                permanent
+                direction="top"
+                offset={[-2, -30]}
+                opacity={1}
+                className="border-0! bg-transparent! p-0! shadow-none! before:hidden!"
+              >
+                <div className="rounded-md bg-blue-500 px-2 py-1 font-semibold text-white">
+                  Your Stop
+                </div>
+              </Tooltip>
+            )}
+          </Marker>
+        );
+      })}
     </div>
   );
 }

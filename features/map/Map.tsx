@@ -16,6 +16,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import Markers from "./components/Markers";
+import RecenterMap from "./components/RecenterMap";
 import { useUserStore } from "@/store/userStore";
 import { kourneshStops } from "../shared/data/busStops";
 
@@ -34,6 +35,9 @@ export default function Map({ entryLogs }: { entryLogs: BusEntryType[] }) {
     submitEntry,
   } = useMap();
 
+  const selectedBusStopData = kourneshStops.find(
+    (stop) => stop.id === selectedBusStop,
+  );
   const user = useUserStore((state) => state.user);
 
   useEffect(() => {
@@ -75,10 +79,15 @@ export default function Map({ entryLogs }: { entryLogs: BusEntryType[] }) {
       <div className="flex h-[calc(100dvh-var(--bottom-navbar-height))] flex-col items-center justify-between pb-2">
         <MapContainer
           className="h-100 w-full z-0"
-          center={[31.250545425899407, 29.970028787218897]}
+          center={[
+            selectedBusStopData?.lat ?? 31.255502,
+            selectedBusStopData?.long ?? 29.9773,
+          ]}
           zoom={14}
         >
           <TileLayer url="https://tile.openstreetmap.org/{z}/{x}/{y}.png" />
+
+          <RecenterMap stop={selectedBusStopData} />
 
           <Markers
             markers={busStopMarkers}

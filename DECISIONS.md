@@ -135,3 +135,21 @@
 **Gotchas:** Realtime marker payloads must retain `busRoute`; otherwise clients cannot safely filter socket events by route.
 
 **Key concepts:** route-scoped rendering, realtime filtering, marker payloads
+
+## Animated Map Recenter On Stop Selection - 2026-09-12
+
+**What:** The map now smoothly recenters on the bus stop selected in the entry form.
+
+**Files involved:** `features/map/Map.tsx`, `features/map/components/RecenterMap.tsx`
+
+**How it works:** `RecenterMap` renders inside `MapContainer`, reads the Leaflet instance through React Leaflet's `useMap()` hook, and calls `flyTo` with the selected stop coordinates while preserving the current zoom. Missing stops are ignored, and the existing `MapContainer` instance is preserved.
+
+**Why:** React Leaflet treats `MapContainer.center` as an initialization value. Calling `flyTo` responds to later selection changes without remounting the map or resetting user interaction state.
+
+**Gotchas:**
+
+- Keep `RecenterMap` inside `MapContainer`; `useMap()` requires the React Leaflet map context.
+- Avoid forcing a remount with a changing `key`, because that resets zoom and map interaction state.
+- The initial `center` fallback remains responsible for the first render when no stop is selected.
+
+**Key concepts:** React Leaflet `useMap`, Leaflet `flyTo`, map context, controlled recentering
