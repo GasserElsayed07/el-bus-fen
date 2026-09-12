@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useUserStore } from "@/store/userStore";
 import type { UserType } from "@/features/shared/models/user";
+import Loading from "@/components/loading";
 
 export default function UserStoreProvider({
   user,
@@ -20,7 +21,7 @@ export default function UserStoreProvider({
   }, [user, setUser]);
 
   if (!ready) {
-    return <div>Loading...</div>;
+    return <Loading />;
   }
 
   return (

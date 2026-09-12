@@ -2,12 +2,11 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useUserStore } from "@/store/userStore";
 import { getCurrentUser } from "@/features/shared/apis/getUser";
+import Loading from "@/components/loading";
 
 export default function AuthLoadingPage() {
   const router = useRouter();
-  // const setUser = useUserStore((state) => state.useUser);
 
   useEffect(() => {
     async function initializeUser() {
@@ -17,8 +16,6 @@ export default function AuthLoadingPage() {
         router.replace("/login");
         return;
       }
-
-      // setUser(user);
 
       if (!user.onboarded) {
         router.replace("/onboarding");
@@ -30,5 +27,5 @@ export default function AuthLoadingPage() {
     initializeUser();
   }, [router]);
 
-  return <div>RedirectTemp: Loading...</div>;
+  return <Loading />;
 }
