@@ -6,7 +6,8 @@ import EntryForm from "./components/EntryForm";
 import { useMap } from "./useMapHook";
 import { getMinutesAgo } from "./utils";
 import BottomNavbar from "@/features/bottom-navbar";
-import { socket } from "@/features/shared/socket";
+// import {socket} from "@/features/shared/socket";
+import { createSocket } from "@/features/shared/socket";
 import type { marker } from "./types";
 import type { BusEntryType } from "@/features/shared/models/bus-entry";
 import {
@@ -68,12 +69,36 @@ export default function Map({ entryLogs }: { entryLogs: BusEntryType[] }) {
       setEntries((prevEntries) => [...prevEntries, newMarker]);
     };
 
-    socket.on("newEntry", handleIncomingEntry);
+    // socket.on("newEntry", handleIncomingEntry);
 
     return () => {
-      socket.off("newEntry", handleIncomingEntry);
+      // socket.off("newEntry", handleIncomingEntry);
     };
   }, [entryLogs, setEntries, user?.busRoute]);
+
+  useEffect(() => {
+    const socket = createSocket();
+
+    socket.addEventListener("open", () => {
+      console.log("CONNECTED TO WEBSOCKET");
+    });
+
+    socket.addEventListener("message", (event) => {
+      console.log("RECEIVED FROM SERVER:", event.data);
+    });
+
+    socket.addEventListener("close", () => {
+      console.log("WEBSOCKET CLOSED");
+    });
+
+    socket.addEventListener("error", (error) => {
+      console.error("WEBSOCKET ERROR:", error);
+    });
+
+    return () => {
+      socket.close();
+    };
+  }, []);
   return (
     <>
       <div className="flex h-[calc(100dvh-var(--bottom-navbar-height))] flex-col items-center justify-between pb-2">

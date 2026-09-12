@@ -73,7 +73,7 @@ export default function Markers({
               },
             }}
           >
-            <div>{`${getMinutesAgo(marker)} minutes ago`}</div>
+            <div>{`${getMinutesAgo(marker)} min ago`}</div>
             {/* <div>{`${marker.hour}:${marker.minutes
                             .toString()
                             .padStart(2, "0")} AM`}</div> */}

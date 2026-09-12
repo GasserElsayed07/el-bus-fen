@@ -1,5 +1,7 @@
-"use client";
+export function createSocket() {
+  const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
 
-import { io } from "socket.io-client";
+  const socket = new WebSocket(`${protocol}//${window.location.host}/api/ws`);
 
-export const socket = io();
+  return socket;
+}

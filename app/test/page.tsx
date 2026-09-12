@@ -1,26 +1,46 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { socket } from "@/features/shared/socket";
-
+import { useEffect, useState, useRef } from "react";
+// import { socket } from "@/features/shared/socket";
+import { createSocket } from "@/features/shared/socket";
 export default function TestCountersPage() {
   const [countK, setCountK] = useState(0);
   const [countL, setCountL] = useState(0);
 
-  useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "k") {
-        setCountK((current) => current + 1);
-        socket.emit("test-k", "k was pressed");
-      }
-      if (event.key === "l") {
-        setCountL((current) => current + 1);
-        socket.emit("test-l", "l was pressed");
-      }
-    };
+  // useEffect(() => {
+  //   const handleKeyDown = (event: KeyboardEvent) => {
+  //     if (event.key === "k") {
+  //       setCountK((current) => current + 1);
+  //       // socket.emit("test-k", "k was pressed");
+  //     }
+  //     if (event.key === "l") {
+  //       setCountL((current) => current + 1);
+  //       // socket.emit("test-l", "l was pressed");
+  //     }
+  //   };
 
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
+  //   window.addEventListener("keydown", handleKeyDown);
+  //   return () => window.removeEventListener("keydown", handleKeyDown);
+  // }, []);
+
+  const socketRef = useRef<WebSocket | null>(null);
+
+  useEffect(() => {
+    const socket = createSocket();
+
+    socketRef.current = socket;
+
+    socket.addEventListener("open", () => {
+      console.log("CONNECTED");
+    });
+
+    socket.addEventListener("message", (event) => {
+      console.log("RECEIVED:", event.data);
+    });
+
+    return () => {
+      socket.close();
+    };
   }, []);
 
   return (
@@ -40,7 +60,9 @@ export default function TestCountersPage() {
             <div className="text-sm text-slate-500">Counter K</div>
             <div className="text-4xl font-bold text-slate-900">{countK}</div>
             <button
-              onClick={() => setCountK(0)}
+              onClick={() => {
+                socketRef.current?.send("hello and K from client");
+              }}
               className="mt-4 inline-flex rounded-full bg-slate-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-700"
             >
               Clear K
@@ -51,7 +73,9 @@ export default function TestCountersPage() {
             <div className="text-sm text-slate-500">Counter L</div>
             <div className="text-4xl font-bold text-slate-900">{countL}</div>
             <button
-              onClick={() => setCountL(0)}
+              onClick={() => {
+                socketRef.current?.send("hello and L from client");
+              }}
               className="mt-4 inline-flex rounded-full bg-slate-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-700"
             >
               Clear L
