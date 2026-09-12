@@ -1,11 +1,11 @@
-import { marker } from "./types";
+import { entry } from "./types";
 
-export function getMinutesAgo(marker: marker): number {
+export function getMinutesAgo(entry: entry): number {
   const now = new Date();
 
   const markerTime = new Date();
-  markerTime.setHours(marker.hour);
-  markerTime.setMinutes(marker.minutes);
+  markerTime.setHours(entry.hour);
+  markerTime.setMinutes(entry.minutes);
   markerTime.setSeconds(0);
   markerTime.setMilliseconds(0);
 
