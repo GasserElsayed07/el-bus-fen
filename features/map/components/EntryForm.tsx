@@ -70,6 +70,7 @@ export default function EntryForm({
   const amPmOptions = useMemo(() => createAmPmOptions(), []);
   const stopOptions = useMemo(() => createStopOptions(), []);
   const [isEditingStop, setIsEditingStop] = useState(false);
+  const [isStopMenuOpen, setIsStopMenuOpen] = useState(false);
   const [draftBusStop, setDraftBusStop] = useState<string | null>(null);
   const [selectedHour, setSelectedHour] = useState<string | undefined>("7");
   const [selectedMinute, setSelectedMinute] = useState<string | undefined>(
@@ -98,21 +99,22 @@ export default function EntryForm({
           </div>
         ) : (
           <Select
+            open={isStopMenuOpen}
+            onOpenChange={(open) => {
+              setIsStopMenuOpen(open);
+              if (!open) {
+                setIsEditingStop(false);
+              }
+            }}
             value={draftBusStop ?? ""}
             onValueChange={(value) => {
               setDraftBusStop(value);
+              setIsStopMenuOpen(false);
               setSelectedStop(value);
               setIsEditingStop(false);
-              console.log("draftBusStop", value);
             }}
           >
-            <SelectTrigger
-              className="w-full flex-1 min-w-0"
-              onSelect={(e) => {
-                e.stopPropagation();
-                console.log("SelectTrigger clicked" + e.target);
-              }}
-            >
+            <SelectTrigger className="w-full flex-1 min-w-0">
               <SelectValue placeholder="Please select a bus stop" />
             </SelectTrigger>
             <SelectContent>
@@ -135,6 +137,7 @@ export default function EntryForm({
             onClick={() => {
               setDraftBusStop(null);
               setIsEditingStop(true);
+              setIsStopMenuOpen(true);
             }}
           >
             <PencilLine className="h-4 w-4" />
