@@ -3,9 +3,15 @@
 import { entry, marker } from "../types";
 import { Marker, Tooltip } from "react-leaflet";
 import L from "leaflet";
-import { getMinutesAgo } from "../utils";
+import { useMemo, useState } from "react";
 import { useUserStore } from "@/store/userStore";
 import { kourneshStops } from "@/features/shared/data/busStops";
+import GroupedEntryTooltip from "./GroupedEntryTooltip";
+import {
+  getEntryGroupKey,
+  getEntryIdentity,
+  getEntryTimeInMinutes,
+} from "../utils";
 
 const busEntryIcon = L.icon({
   iconUrl: "/icons/mapMarker.png",
@@ -45,46 +51,103 @@ export default function Markers({
   setDialogOpen: (open: boolean) => void;
 }) {
   const user = useUserStore((state) => state.user);
+  const [expandedGroups, setExpandedGroups] = useState<Set<string>>(
+    () => new Set(),
+  );
+
+  const entryGroups = useMemo(() => {
+    const groups = new Map<string, entry[]>();
+    const seenEntries = new Set<string>();
+
+    for (const currentEntry of entries) {
+      const entryIdentity = getEntryIdentity(currentEntry);
+
+      if (seenEntries.has(entryIdentity)) {
+        continue;
+      }
+
+      seenEntries.add(entryIdentity);
+      const groupKey = getEntryGroupKey(currentEntry);
+      const group = groups.get(groupKey) ?? [];
+
+      group.push(currentEntry);
+      groups.set(groupKey, group);
+    }
+
+    return Array.from(groups, ([groupKey, groupEntries]) => ({
+      groupKey,
+      entries: groupEntries.sort(
+        (firstEntry, secondEntry) =>
+          getEntryTimeInMinutes(secondEntry) -
+          getEntryTimeInMinutes(firstEntry),
+      ),
+    }));
+  }, [entries]);
+
+  function toggleGroup(groupKey: string) {
+    setExpandedGroups((currentGroups) => {
+      const nextGroups = new Set(currentGroups);
+
+      if (nextGroups.has(groupKey)) {
+        nextGroups.delete(groupKey);
+      } else {
+        nextGroups.add(groupKey);
+      }
+
+      return nextGroups;
+    });
+  }
+
+  function handleEntryClick(selectedEntry: entry) {
+    setSelectedEntry(selectedEntry);
+    setDialogOpen(true);
+  }
 
   return (
     <div>
-      {entries.map((entry, i) => (
-        <Marker
-          key={i + entry.lat}
-          position={[entry.lat, entry.long]}
-          icon={icon}
-          opacity={0}
-          eventHandlers={{
-            click: () => {
-              setSelectedEntry(entry);
-              setDialogOpen(true);
-            },
-          }}
-        >
-          <Tooltip
-            permanent
-            direction="top"
-            offset={[-5, -30]}
-            className="rounded-lg text-[0.5rem] font-bold text-black"
+      {entryGroups.map(({ groupKey, entries: groupEntries }) => {
+        const latestEntry = groupEntries[0];
+
+        return (
+          <Marker
+            key={groupKey}
+            position={[latestEntry.lat, latestEntry.long]}
+            icon={icon}
+            opacity={0}
             eventHandlers={{
-              click: () => {
-                setSelectedEntry(entry);
-                setDialogOpen(true);
-              },
+              click: () => handleEntryClick(latestEntry),
             }}
           >
-            <div>{`${getMinutesAgo(entry)} min ago`}</div>
-            {/* <div>{`${entry.hour}:${entry.minutes
-                            .toString()
-                            .padStart(2, "0")} AM`}</div> */}
-          </Tooltip>
-        </Marker>
-      ))}
+            <Tooltip
+              permanent
+              interactive
+              direction="top"
+              offset={[-5, -30]}
+              className="border-0! bg-transparent! p-0! shadow-none! before:hidden!"
+            >
+              <GroupedEntryTooltip
+                entries={groupEntries}
+                latestEntry={latestEntry}
+                isExpanded={expandedGroups.has(groupKey)}
+                onToggle={() => toggleGroup(groupKey)}
+                onEntryClick={handleEntryClick}
+              />
+            </Tooltip>
+          </Marker>
+        );
+      })}
       {markers.map((entry, i) => {
-        const isUserStop =
-          kourneshStops.find(
-            (stop) => stop.lat === entry.lat && stop.long === entry.long,
-          )?.id === user?.busStopId;
+        const stopId = kourneshStops.find(
+          (stop) => stop.lat === entry.lat && stop.long === entry.long,
+        )?.id;
+        const isUserStop = stopId === user?.busStopId;
+        const hasEntriesAtStop = entries.some(
+          (currentEntry) =>
+            currentEntry.busStop === stopId ||
+            (currentEntry.busStop === undefined &&
+              currentEntry.lat === entry.lat &&
+              currentEntry.long === entry.long),
+        );
 
         return (
           <Marker
@@ -92,7 +155,7 @@ export default function Markers({
             position={[entry.lat, entry.long]}
             icon={isUserStop ? yourStopMarkerIcon : busStopIcon}
           >
-            {isUserStop && (
+            {isUserStop && !hasEntriesAtStop && (
               <Tooltip
                 permanent
                 direction="top"

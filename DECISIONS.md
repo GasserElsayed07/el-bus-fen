@@ -169,3 +169,17 @@
 - The `app/layout.tsx` import uses `../components/ui/sonner` because the editor resolver reported the new alias import as missing even though the alias works elsewhere.
 
 **Key concepts:** async UI state, disabled submit controls, Sonner toast, root provider
+
+## Transparent Map Entry Tooltips - 2026-09-13
+
+**What:** Updated map entry tooltips to render only their child label while keeping the Leaflet tooltip container invisible.
+
+**Files involved:** `features/map/components/Markers.tsx`
+
+**How it works:** The entry tooltip uses the same transparent wrapper classes as the user-stop tooltip. Its child owns the visible white label styling and uses `rounded-xl` for a softer shape.
+
+**Why:** Keeping the Leaflet wrapper invisible gives both tooltip types the same visual structure and avoids the default tooltip chrome around custom content.
+
+**Gotchas:** Keep the background, padding, text, and radius on the child element; moving them back to the Leaflet wrapper would make the wrapper visible again.
+
+**Key concepts:** React Leaflet `Tooltip`, transparent wrapper, custom tooltip content, rounded label

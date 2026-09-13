@@ -11,15 +11,15 @@ export function GET() {
   return experimental_upgradeWebSocket((ws) => {
     clients.add(ws);
 
-    ws.on("message", (data: WebSocketData) => {
-      const message = data.toString();
+    // ws.on("message", (data: WebSocketData) => {
+    //   const message = data.toString();
 
-      for (const client of clients) {
-        if (client !== ws && client.readyState === 1) {
-          client.send(message);
-        }
-      }
-    });
+    //   for (const client of clients) {
+    //     if (client !== ws && client.readyState === 1) {
+    //       client.send(message);
+    //     }
+    //   }
+    // });
 
     ws.on("message", (data) => {
       const message = JSON.parse(data.toString());

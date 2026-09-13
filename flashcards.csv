@@ -31,3 +31,6 @@
 "Where does the bus-entry submitting state live?","In `features/map/useMapHook.ts`, which sets `isSubmitting` around the awaited persistence call and exposes it to the form through the hook API.","map,submission,async-state"
 "When does bus-entry submission show a success toast?","Only after `addBusEntry` returns a saved entry; the success toast is emitted with Sonner after the database operation succeeds.","map,submission,toast"
 "Why is the toast host mounted in the root layout?","A single root-level Sonner host lets any client feature call `toast.success` while keeping the notification portal available across routes.","layout,sonner,toast"
+"How are normal map entry tooltips made visually custom?","Their Leaflet `Tooltip` wrapper is made transparent with border, background, padding, shadow, and arrow overrides; the child renders the visible label.","map,react-leaflet,tooltip"
+"Where is the visible styling for map entry tooltip labels?","In the child `div` inside `features/map/components/Markers.tsx`, which supplies the white background, padding, text styling, and `rounded-xl` radius.","map,tooltip,styling"
+"What breaks if tooltip styling moves back to the Leaflet wrapper?","The wrapper becomes visible again and reintroduces the default tooltip chrome around the custom child content.","map,react-leaflet,gotcha"

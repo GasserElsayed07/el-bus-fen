@@ -60,9 +60,12 @@ export default function Map({ entryLogs }: { entryLogs: BusEntryType[] }) {
           {
             lat: entry.lat,
             long: entry.long,
-            hour: entryTime.getHours(),
+            hour: entryTime.getHours() % 12 || 12,
             minutes: entryTime.getMinutes(),
+            amPm: entryTime.getHours() >= 12 ? "PM" : "AM",
+            busStop: entry.busStop,
             busRoute: entry.busRoute,
+            id: entry._id ? String(entry._id) : undefined,
           },
         ];
       });

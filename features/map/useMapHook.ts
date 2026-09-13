@@ -152,8 +152,10 @@ export function useMap() {
       const newEntry: entry = {
         hour: Number(selectedHour ?? 0),
         minutes: Number(selectedMinute ?? 0),
+        amPm: selectedAmPm,
         lat: Number(selectedStopDetails.lat ?? 0),
         long: Number(selectedStopDetails.long ?? 0),
+        busStop: selectedBusStop as string,
         busRoute: user?.busRoute,
       };
 
@@ -172,6 +174,11 @@ export function useMap() {
         return;
       }
 
+      const entryWithIdentity: entry = {
+        ...newEntry,
+        id: newBusEntry._id ? String(newBusEntry._id) : undefined,
+      };
+
       console.log("entry log created:", newBusEntry);
 
       const socket = socketRef.current;
@@ -180,7 +187,7 @@ export function useMap() {
         socket.send(
           JSON.stringify({
             type: "newEntry",
-            entry: newEntry,
+            entry: entryWithIdentity,
           }),
         );
       } else {
@@ -188,7 +195,7 @@ export function useMap() {
       }
 
       // Show the entry immediately to the user who submitted it
-      setEntries((prevEntries) => [...prevEntries, newEntry]);
+      setEntries((prevEntries) => [...prevEntries, entryWithIdentity]);
       toast.success("Submitted successfully!");
     } finally {
       setIsSubmitting(false);
