@@ -1,6 +1,7 @@
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { entry } from "../types";
 import { getMinutesAgo } from "../utils";
+import { useEffect, useState } from "react";
 
 export default function GroupedEntryTooltip({
   entries,
@@ -15,14 +16,34 @@ export default function GroupedEntryTooltip({
   onToggle: () => void;
   onEntryClick: (entry: entry) => void;
 }) {
+  const [, setCurrentTime] = useState(() => Date.now());
   const otherEntriesCount = entries.length - 1;
   const Chevron = isExpanded ? ChevronDown : ChevronUp;
+
+  useEffect(() => {
+    let intervalId: ReturnType<typeof setInterval> | undefined;
+
+    const refreshTime = () => {
+      setCurrentTime(Date.now());
+      intervalId = setInterval(() => setCurrentTime(Date.now()), 60_000);
+    };
+
+    const millisecondsUntilNextMinute = 60_000 - (Date.now() % 60_000);
+    const timeoutId = setTimeout(refreshTime, millisecondsUntilNextMinute);
+
+    return () => {
+      clearTimeout(timeoutId);
+      if (intervalId) {
+        clearInterval(intervalId);
+      }
+    };
+  }, []);
 
   return (
     <div className="relative w-max rounded-xl bg-white p-1 text-black">
       {otherEntriesCount > 0 && !isExpanded && (
         <div className="absolute -right-2 -top-2 z-10 flex size-5 items-center justify-center rounded-full bg-blue-500 text-[0.5rem] font-bold text-white">
-          +{otherEntriesCount}
+          {otherEntriesCount}
         </div>
       )}
 
