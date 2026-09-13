@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import "leaflet/dist/leaflet.css";
 import { GoogleOAuthProvider } from "@react-oauth/google";
+import { Toaster } from "../components/ui/sonner";
 
 export const metadata: Metadata = {
   title: "El-Bus fen",
@@ -27,6 +28,7 @@ export default function RootLayout({
           }}
         >
           {children}
+          <Toaster />
         </body>
       </GoogleOAuthProvider>
     </html>

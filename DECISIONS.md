@@ -153,3 +153,19 @@
 - The initial `center` fallback remains responsible for the first render when no stop is selected.
 
 **Key concepts:** React Leaflet `useMap`, Leaflet `flyTo`, map context, controlled recentering
+
+## Interactive Bus Entry Submission - 2026-09-13
+
+**What:** Added a disabled loading state and success toast to bus-entry submission.
+
+**Files involved:** `features/map/useMapHook.ts`, `features/map/components/EntryForm.tsx`, `features/map/Map.tsx`, `components/ui/sonner.tsx`, `app/layout.tsx`
+
+**How it works:** The map hook exposes `isSubmitting`, sets it around the awaited `addBusEntry` call, and shows a green Sonner success toast only after persistence succeeds. The form disables its submit button and renders a spinning loader while the request is active. The toast host is mounted once in the root layout using a relative import for reliable layout module resolution.
+
+**Gotchas:**
+
+- Keep `isSubmitting` in the hook so all async submission paths share the same lock.
+- The toast host must be mounted under the document body before `toast.success` can render.
+- The `app/layout.tsx` import uses `../components/ui/sonner` because the editor resolver reported the new alias import as missing even though the alias works elsewhere.
+
+**Key concepts:** async UI state, disabled submit controls, Sonner toast, root provider

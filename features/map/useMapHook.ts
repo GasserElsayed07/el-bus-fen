@@ -5,6 +5,7 @@ import { entry, marker } from "./types";
 import { kourneshStops } from "../shared/data/busStops";
 import { createSocket } from "@/features/shared/socket";
 import { addBusEntry } from "../shared/repositories/bus-entry-repo";
+import { toast } from "sonner";
 
 export function createMarkers(
   busStops: Array<{ lat: number; long: number }>,
@@ -50,6 +51,7 @@ export function useMap() {
 
   const [selectedEntry, setSelectedEntry] = useState<entry | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Sync selected bus stop to the user
   useEffect(() => {
@@ -129,7 +131,7 @@ export function useMap() {
     selectedHour: string | undefined,
     selectedMinute: string | undefined,
     selectedAmPm: string | undefined,
-  ) {
+  ): Promise<void> {
     const selectedStopDetails =
       kourneshStops.find((stop) => stop.id === selectedBusStop) ?? null;
 
@@ -137,53 +139,60 @@ export function useMap() {
       return;
     }
 
-    console.log("I fired submitEntry", {
-      selectedHour,
-      selectedMinute,
-      selectedBusStop,
-      selectedStopDetails,
-    });
+    setIsSubmitting(true);
 
-    const newEntry: entry = {
-      hour: Number(selectedHour ?? 0),
-      minutes: Number(selectedMinute ?? 0),
-      lat: Number(selectedStopDetails.lat ?? 0),
-      long: Number(selectedStopDetails.long ?? 0),
-      busRoute: user?.busRoute,
-    };
+    try {
+      console.log("I fired submitEntry", {
+        selectedHour,
+        selectedMinute,
+        selectedBusStop,
+        selectedStopDetails,
+      });
 
-    const newBusEntry = await addBusEntry({
-      userId: user?._id ?? "",
-      selectedHour: selectedHour ?? "",
-      selectedMinute: selectedMinute ?? "",
-      selectedAmPm: selectedAmPm ?? "",
-      busRoute: user?.busRoute,
-      busStop: selectedBusStop as string,
-      lat: newEntry.lat,
-      long: newEntry.long,
-    });
+      const newEntry: entry = {
+        hour: Number(selectedHour ?? 0),
+        minutes: Number(selectedMinute ?? 0),
+        lat: Number(selectedStopDetails.lat ?? 0),
+        long: Number(selectedStopDetails.long ?? 0),
+        busRoute: user?.busRoute,
+      };
 
-    if (!newBusEntry) {
-      return;
+      const newBusEntry = await addBusEntry({
+        userId: user?._id ?? "",
+        selectedHour: selectedHour ?? "",
+        selectedMinute: selectedMinute ?? "",
+        selectedAmPm: selectedAmPm ?? "",
+        busRoute: user?.busRoute,
+        busStop: selectedBusStop as string,
+        lat: newEntry.lat,
+        long: newEntry.long,
+      });
+
+      if (!newBusEntry) {
+        return;
+      }
+
+      console.log("entry log created:", newBusEntry);
+
+      const socket = socketRef.current;
+
+      if (socket?.readyState === WebSocket.OPEN) {
+        socket.send(
+          JSON.stringify({
+            type: "newEntry",
+            entry: newEntry,
+          }),
+        );
+      } else {
+        console.log("WebSocket is not connected yet");
+      }
+
+      // Show the entry immediately to the user who submitted it
+      setEntries((prevEntries) => [...prevEntries, newEntry]);
+      toast.success("Submitted successfully!");
+    } finally {
+      setIsSubmitting(false);
     }
-
-    console.log("entry log created:", newBusEntry);
-
-    const socket = socketRef.current;
-
-    if (socket?.readyState === WebSocket.OPEN) {
-      socket.send(
-        JSON.stringify({
-          type: "newEntry",
-          entry: newEntry,
-        }),
-      );
-    } else {
-      console.log("WebSocket is not connected yet");
-    }
-
-    // Show the entry immediately to the user who submitted it
-    setEntries((prevEntries) => [...prevEntries, newEntry]);
   }
 
   return {
@@ -197,6 +206,7 @@ export function useMap() {
     setDialogOpen,
     selectedBusStop,
     setSelectedBusStop,
+    isSubmitting,
     submitEntry,
   };
 }

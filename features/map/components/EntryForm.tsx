@@ -14,14 +14,14 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { kourneshStops } from "@/features/shared/data/busStops";
-import { PencilLine } from "lucide-react";
+import { LoaderCircle, PencilLine } from "lucide-react";
 import { useMemo, useState } from "react";
 
 type SubmitEntry = (
   selectedHour: string | undefined,
   selectedMinute: string | undefined,
   selectedAmPm: string | undefined,
-) => void;
+) => Promise<void>;
 
 const createHourOptions = (): WheelPickerOption[] =>
   Array.from({ length: 12 }, (_, index) => {
@@ -56,10 +56,12 @@ const createStopOptions = () =>
 
 export default function EntryForm({
   submitEntry,
+  isSubmitting,
   selectedStop,
   setSelectedStop,
 }: {
   submitEntry: SubmitEntry;
+  isSubmitting: boolean;
   selectedStop: string | null;
   setSelectedStop: (value: string | null) => void;
 }) {
@@ -161,8 +163,18 @@ export default function EntryForm({
           />
         </WheelPickerWrapper>
       </div>
-      <Button onClick={handleOnSubmit} className="w-full" variant="secondary">
-        submit
+      <Button
+        onClick={handleOnSubmit}
+        className="w-full"
+        variant="secondary"
+        disabled={isSubmitting}
+        aria-busy={isSubmitting}
+      >
+        {isSubmitting ? (
+          <LoaderCircle className="animate-spin" aria-hidden="true" />
+        ) : (
+          "submit"
+        )}
       </Button>
     </div>
   );

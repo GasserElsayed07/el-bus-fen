@@ -30,6 +30,7 @@ export default function Map({ entryLogs }: { entryLogs: BusEntryType[] }) {
     setDialogOpen,
     selectedBusStop,
     setSelectedBusStop,
+    isSubmitting,
     submitEntry,
   } = useMap();
 
@@ -130,6 +131,7 @@ export default function Map({ entryLogs }: { entryLogs: BusEntryType[] }) {
 
         <EntryForm
           submitEntry={submitEntry}
+          isSubmitting={isSubmitting}
           selectedStop={selectedBusStop}
           setSelectedStop={setSelectedBusStop}
         />
