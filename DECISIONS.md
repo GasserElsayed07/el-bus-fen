@@ -183,3 +183,20 @@
 **Gotchas:** Keep the background, padding, text, and radius on the child element; moving them back to the Leaflet wrapper would make the wrapper visible again.
 
 **Key concepts:** React Leaflet `Tooltip`, transparent wrapper, custom tooltip content, rounded label
+
+## Restrained Onboarding Route Availability UI - 2026-09-13
+
+**What:** Refined onboarding's first step and made the current route support explicit.
+
+**Files involved:** `features/onboarding/Onboarding.tsx`, `features/onboarding/components/FirstPage.tsx`
+
+**How it works:** The first step uses a centered content region with a small bus icon, clearer labels, helper copy, and a two-segment progress indicator. `Kournesh` remains selectable, while the other entries from `busRoutes` stay visible in the menu with disabled state and a `Coming soon` label.
+
+**Why:** The app currently has stop data only for Kournesh. Showing future routes without allowing selection communicates the product roadmap without making the onboarding feel disconnected from the existing app styling.
+
+**Gotchas:**
+
+- Keep the availability check aligned with the route data that has corresponding stop data.
+- The route selector stores `name_en`, so the disabled state must not introduce a different route identifier shape.
+
+**Key concepts:** disabled select items, progressive disclosure, onboarding hierarchy, route availability

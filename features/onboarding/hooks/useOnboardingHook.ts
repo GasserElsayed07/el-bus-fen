@@ -10,10 +10,16 @@ export function useOnboarding() {
   const [selectedStop, setSelectedStop] = useState<string | null>(null);
   const [name, setName] = useState<string>("");
   const [currentStep, setCurrentStep] = useState<number>(1);
+  const [hasAttemptedNext, setHasAttemptedNext] = useState(false);
   // I need to add a soft debounce, that will save the current selected options after the user selects them after 1s.
   // timeout 1s -> user.save(currentStateOptions)
 
   const setUser = useUserStore((state) => state.useUser);
+
+  function handleRouteChange(route: string | null) {
+    setSelectedRoute(route);
+    setSelectedStop(null);
+  }
 
   async function refetchUserAndSaveToUserStore() {
     const refreshedUser = await getCurrentUser();
@@ -23,6 +29,11 @@ export function useOnboarding() {
   async function handleNextStep() {
     let fieldsToUpdate;
     if (currentStep == 1) {
+      setHasAttemptedNext(true);
+      if (!selectedRoute || !selectedStop) {
+        return;
+      }
+
       // hard save the current route and stop options
       // currentStep++
       fieldsToUpdate = {
@@ -57,7 +68,7 @@ export function useOnboarding() {
 
   return {
     selectedRoute,
-    setSelectedRoute,
+    handleRouteChange,
     selectedStop,
     setSelectedStop,
     name,
@@ -65,5 +76,7 @@ export function useOnboarding() {
     currentStep,
     handleNextStep,
     handleBackStep,
+    showRouteWarning: hasAttemptedNext && !selectedRoute,
+    showStopWarning: hasAttemptedNext && !selectedStop,
   };
 }
