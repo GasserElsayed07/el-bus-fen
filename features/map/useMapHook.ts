@@ -3,9 +3,10 @@ import { useUserStore } from "@/store/userStore";
 import { updateUserWithCustomFields } from "@/features/shared/repositories/user-repo";
 import { entry, marker } from "./types";
 import { kourneshStops } from "../shared/data/busStops";
-import { createSocket } from "@/features/shared/socket";
 import { addBusEntry } from "../shared/repositories/bus-entry-repo";
 import { toast } from "sonner";
+import { useCallback } from "react";
+import { useWebSocket } from "@/features/shared/useWebSocket";
 
 export function createMarkers(
   busStops: Array<{ lat: number; long: number }>,
@@ -91,41 +92,19 @@ export function useMap() {
     };
   }, [selectedBusStop, setUser]);
 
-  // Create and maintain the WebSocket connection
-  useEffect(() => {
-    const socket = createSocket();
+  const handleWebSocketMessage = useCallback((event: MessageEvent) => {
+    const message = JSON.parse(event.data);
 
-    socketRef.current = socket;
+    if (message.type !== "newEntry") {
+      return;
+    }
 
-    socket.addEventListener("open", () => {
-      console.log("CONNECTED TO WEBSOCKET");
-    });
+    const newEntry: entry = message.entry;
 
-    socket.addEventListener("message", (event) => {
-      const message = JSON.parse(event.data);
-
-      if (message.type !== "newEntry") {
-        return;
-      }
-
-      const newEntry: entry = message.entry;
-
-      setEntries((prevEntries) => [...prevEntries, newEntry]);
-    });
-
-    socket.addEventListener("close", () => {
-      console.log("WEBSOCKET CLOSED");
-    });
-
-    socket.addEventListener("error", (error) => {
-      console.error("WEBSOCKET ERROR:", error);
-    });
-
-    return () => {
-      socket.close();
-      socketRef.current = null;
-    };
+    setEntries((prevEntries) => [...prevEntries, newEntry]);
   }, []);
+
+  const { send } = useWebSocket(handleWebSocketMessage);
 
   async function submitEntry(
     selectedHour: string | undefined,
@@ -181,18 +160,10 @@ export function useMap() {
 
       console.log("entry log created:", newBusEntry);
 
-      const socket = socketRef.current;
-
-      if (socket?.readyState === WebSocket.OPEN) {
-        socket.send(
-          JSON.stringify({
-            type: "newEntry",
-            entry: entryWithIdentity,
-          }),
-        );
-      } else {
-        console.log("WebSocket is not connected yet");
-      }
+      send({
+        type: "newEntry",
+        entry: entryWithIdentity,
+      });
 
       // Show the entry immediately to the user who submitted it
       setEntries((prevEntries) => [...prevEntries, entryWithIdentity]);
