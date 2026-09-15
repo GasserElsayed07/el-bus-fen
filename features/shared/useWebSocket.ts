@@ -1,12 +1,25 @@
 import { useEffect, useRef } from "react";
 import { createSocket } from "./socket";
 
-export function useWebSocket(onMessage: (event: MessageEvent) => void) {
+interface UseWebSocketOptions {
+  onReconnect?: () => void;
+}
+
+interface UseWebSocketResult {
+  send: (message: unknown) => boolean;
+}
+
+export function useWebSocket(
+  onMessage: (event: MessageEvent) => void,
+  options: UseWebSocketOptions = {},
+): UseWebSocketResult {
   const socketRef = useRef<WebSocket | null>(null);
   const reconnectTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
     null,
   );
   const shouldReconnectRef = useRef(true);
+  const hasConnectedRef = useRef(false);
+  const { onReconnect } = options;
 
   useEffect(() => {
     shouldReconnectRef.current = true;
@@ -22,6 +35,10 @@ export function useWebSocket(onMessage: (event: MessageEvent) => void) {
 
       socket.addEventListener("open", () => {
         console.log("CONNECTED TO WEBSOCKET");
+        if (hasConnectedRef.current) {
+          onReconnect?.();
+        }
+        hasConnectedRef.current = true;
       });
 
       socket.addEventListener("message", onMessage);
@@ -59,7 +76,7 @@ export function useWebSocket(onMessage: (event: MessageEvent) => void) {
       socketRef.current?.close();
       socketRef.current = null;
     };
-  }, [onMessage]);
+  }, [onMessage, onReconnect]);
 
   const send = (message: unknown) => {
     const socket = socketRef.current;

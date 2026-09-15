@@ -200,3 +200,20 @@
 - The route selector stores `name_en`, so the disabled state must not introduce a different route identifier shape.
 
 **Key concepts:** disabled select items, progressive disclosure, onboarding hierarchy, route availability
+
+## Silent WebSocket Reconnect Sync - 2026-09-15
+
+**What:** Recovered bus entries missed during a WebSocket disconnect without adding reconnect notifications.
+
+**Files involved:** `features/shared/useWebSocket.ts`, `features/map/useMapHook.ts`, `features/map/Map.tsx`
+
+**How it works:** The WebSocket hook calls one optional `onReconnect` callback after the connection has opened once and later opens again. The map hook refetches the existing seven-hour entry window and merges entries by persisted `_id`; initial database entries and live socket entries use the same duplicate check.
+
+**Why:** MongoDB is the source of truth, while WebSocket is only live delivery. A reconnect snapshot is the smallest way to recover entries created during the disconnected interval.
+
+**Gotchas:**
+
+- Keep persisted entries' stable `_id` in the client `entry.id` field so reconnect merging remains idempotent.
+- The reconnect sync is intentionally silent for now; it should not be confused with the existing submission-success toast.
+
+**Key concepts:** reconnect callback, persisted snapshot, idempotent merge, WebSocket live delivery

@@ -38,3 +38,6 @@
 "How does onboarding communicate future bus routes?","The route menu keeps future routes visible, disables them, and labels each one `Coming soon`; helper text also says that more routes are on the way.","onboarding,ui,routes"
 "Where is the onboarding progress indicator rendered?","In `features/onboarding/Onboarding.tsx`, as two adjacent progress segments: the first is complete on step one, and the second fills on step two.","onboarding,progress"
 "Why does the onboarding first step avoid hiding future routes?","Keeping future routes visible signals that the app is expanding while preventing unsupported route and stop combinations from being selected today.","onboarding,product,ux"
+"What happens after the map WebSocket reconnects?","The socket hook calls `onReconnect`, and the map refetches the existing seven-hour MongoDB entry window to recover reports missed while disconnected.","map,socket,reconnect"
+"How are entries merged after a reconnect?","The map compares persisted database IDs stored as `entry.id` and appends only entries whose IDs are not already present.","map,bus-entry,deduplication"
+"Why is MongoDB queried after a WebSocket reconnect?","MongoDB is the source of truth and the WebSocket only delivers live events, so a reconnect snapshot fills the delivery gap without a manual page refresh.","map,mongodb,socket,reconnect"

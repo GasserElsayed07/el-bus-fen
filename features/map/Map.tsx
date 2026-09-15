@@ -70,7 +70,20 @@ export default function Map({ entryLogs }: { entryLogs: BusEntryType[] }) {
         ];
       });
 
-    setEntries((prevEntries) => [...prevEntries, ...newEntries]);
+    setEntries((prevEntries) => {
+      const existingIds = new Set(
+        prevEntries
+          .map((currentEntry) => currentEntry.id)
+          .filter((id): id is string => Boolean(id)),
+      );
+
+      return [
+        ...prevEntries,
+        ...newEntries.filter(
+          (newEntry) => !newEntry.id || !existingIds.has(newEntry.id),
+        ),
+      ];
+    });
   }, [entryLogs, setEntries, user?.busRoute]);
 
   return (

@@ -3,7 +3,10 @@ import { useUserStore } from "@/store/userStore";
 import { updateUserWithCustomFields } from "@/features/shared/repositories/user-repo";
 import { entry, marker } from "./types";
 import { kourneshStops } from "../shared/data/busStops";
-import { addBusEntry } from "../shared/repositories/bus-entry-repo";
+import {
+  addBusEntry,
+  getLastSevenHoursBusEntries,
+} from "../shared/repositories/bus-entry-repo";
 import { toast } from "sonner";
 import { useCallback } from "react";
 import { useWebSocket } from "@/features/shared/useWebSocket";
@@ -54,6 +57,24 @@ export function useMap() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const mergeEntries = useCallback((incomingEntries: entry[]) => {
+    setEntries((currentEntries) => {
+      const currentIds = new Set(
+        currentEntries
+          .map((currentEntry) => currentEntry.id)
+          .filter((id): id is string => Boolean(id)),
+      );
+
+      return [
+        ...currentEntries,
+        ...incomingEntries.filter(
+          (incomingEntry) =>
+            !incomingEntry.id || !currentIds.has(incomingEntry.id),
+        ),
+      ];
+    });
+  }, []);
+
   // Sync selected bus stop to the user
   useEffect(() => {
     const currentUser = userRef.current;
@@ -92,19 +113,52 @@ export function useMap() {
     };
   }, [selectedBusStop, setUser]);
 
-  const handleWebSocketMessage = useCallback((event: MessageEvent) => {
-    const message = JSON.parse(event.data);
+  const handleWebSocketMessage = useCallback(
+    (event: MessageEvent) => {
+      const message = JSON.parse(event.data);
 
-    if (message.type !== "newEntry") {
-      return;
-    }
+      if (message.type !== "newEntry") {
+        return;
+      }
 
-    const newEntry: entry = message.entry;
+      const newEntry: entry = message.entry;
 
-    setEntries((prevEntries) => [...prevEntries, newEntry]);
-  }, []);
+      mergeEntries([newEntry]);
+    },
+    [mergeEntries],
+  );
 
-  const { send } = useWebSocket(handleWebSocketMessage);
+  const handleWebSocketReconnect = useCallback(async () => {
+    const recentEntries = await getLastSevenHoursBusEntries();
+    const syncedEntries = (recentEntries ?? [])
+      .filter((recentEntry) => recentEntry.busRoute === user?.busRoute)
+      .flatMap((recentEntry) => {
+        const entryTime = new Date(String(recentEntry.time));
+
+        if (Number.isNaN(entryTime.getTime())) {
+          return [];
+        }
+
+        return [
+          {
+            lat: recentEntry.lat,
+            long: recentEntry.long,
+            hour: entryTime.getHours() % 12 || 12,
+            minutes: entryTime.getMinutes(),
+            amPm: entryTime.getHours() >= 12 ? "PM" : "AM",
+            busStop: recentEntry.busStop,
+            busRoute: recentEntry.busRoute,
+            id: recentEntry._id ? String(recentEntry._id) : undefined,
+          },
+        ];
+      });
+
+    mergeEntries(syncedEntries);
+  }, [mergeEntries, user?.busRoute]);
+
+  const { send } = useWebSocket(handleWebSocketMessage, {
+    onReconnect: handleWebSocketReconnect,
+  });
 
   async function submitEntry(
     selectedHour: string | undefined,
@@ -166,7 +220,7 @@ export function useMap() {
       });
 
       // Show the entry immediately to the user who submitted it
-      setEntries((prevEntries) => [...prevEntries, entryWithIdentity]);
+      mergeEntries([entryWithIdentity]);
       toast.success("Submitted successfully!");
     } finally {
       setIsSubmitting(false);
