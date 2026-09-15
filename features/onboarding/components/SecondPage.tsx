@@ -17,7 +17,7 @@ export default function SecondPage({
     if (user) {
       setName(user.name);
     }
-  }, [user]);
+  }, [setName, user]);
 
   return (
     <div className="flex w-full max-w-md flex-col px-6 py-10">
